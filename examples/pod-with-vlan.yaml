@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: secure-pod
+  namespace: secure-zone-1
+  annotations:
+    k8s.v1.cni.cncf.io/networks: vlan100-network
+spec:
+  containers:
+  - name: secure-app
+    image: nginx:latest
+    ports:
+    - containerPort: 80
+    securityContext:
+      privileged: false
+  nodeSelector:
+    networking/vlan100: "true"

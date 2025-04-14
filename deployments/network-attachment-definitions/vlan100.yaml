@@ -1,0 +1,27 @@
+# 
+# spec.config.type: Specifies which CNI plugin should handle this network (our custom VLAN plugin).
+# spec.config.master: The parent network interface on the host that will be used for creating the VLAN interface. This is typically the primary network interface of the node.
+# spec.config.vlan: The VLAN ID (100) to tag packets with, creating network isolation at layer 2.
+# spec.config.ipam.type: The IP Address Management (IPAM) configuration for the network. This specifies the subnet and routes for the VLAN interface.Uses the "host-local" IPAM (IP Address Management) plugin to allocate IP addresses from a predefined range.
+# spec.config.ipam.subnet: The IP subnet allocated for this VLAN. Notice how the subnet (10.100.0.0/24) aligns with the VLAN ID (100) for easier management.
+# spec.config.ipam.routes: Default route configuration that determines where traffic should be sent if it doesn't match a more specific route.
+
+apiVersion: "k8s.cni.cncf.io/v1"
+kind: NetworkAttachmentDefinition
+metadata:
+  name: vlan100-network
+  namespace: secure-zone-1
+spec: 
+  config: '{
+    "cniVersion": "0.3.1",
+    "type": "vlan-cni", 
+    "master": "eth0",
+    "vlan": 100,
+    "ipam": {
+      "type": "host-local",
+      "subnet": "10.100.0.0/24",
+      "routes": [
+        { "dst": "0.0.0.0/0" }
+      ]
+    }
+  }'

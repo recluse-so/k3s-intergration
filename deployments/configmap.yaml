@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: vlan-cni-config
+  namespace: kube-system
+data:
+  vlan-cni.conf: |
+    {
+      "cniVersion": "0.3.1",
+      "name": "vlan-network",
+      "type": "vlan-cni",
+      "master": "eth0",
+      "mappings": [
+        {
+          "namespace": "secure-zone-1",
+          "vlan": 100
+        },
+        {
+          "namespace": "secure-zone-2",
+          "vlan": 200
+        },
+        {
+          "namespace": "secure-zone-3",
+          "vlan": 300
+        }
+      ]
+    }
