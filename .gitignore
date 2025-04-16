@@ -15,3 +15,5 @@ Cargo.lock
 
 scratch/*
 .DS_Store
+/aranya-core
+/aranya
