@@ -2,7 +2,7 @@ use anyhow::{Context, Result};
 use std::collections::HashMap;
 use std::env;
 use std::io::{self, Read};
-use tracing::{info, error};
+use tokio::runtime::Runtime;
 
 use crate::config::NetConf;
 use crate::plugin::VlanPlugin;
@@ -67,8 +67,11 @@ pub fn cmd_add() -> Result<()> {
     let conf = NetConf::parse(&args.stdin_data)?;
     
     // Create plugin and add network
-    let plugin = VlanPlugin::new(conf, args);
-    let result = plugin.add_network()?;
+    let mut plugin = VlanPlugin::new(conf, args);
+    
+    // Create a runtime to execute async code
+    let runtime = Runtime::new().context("Failed to create Tokio runtime")?;
+    let result = runtime.block_on(plugin.add_network())?;
     
     // Output result as JSON
     result.print()?;
@@ -84,8 +87,11 @@ pub fn cmd_del() -> Result<()> {
     let conf = NetConf::parse(&args.stdin_data)?;
     
     // Create plugin and delete network
-    let plugin = VlanPlugin::new(conf, args);
-    plugin.del_network()?;
+    let mut plugin = VlanPlugin::new(conf, args);
+    
+    // Create a runtime to execute async code
+    let runtime = Runtime::new().context("Failed to create Tokio runtime")?;
+    runtime.block_on(plugin.del_network())?;
     
     Ok(())
 }
@@ -98,8 +104,11 @@ pub fn cmd_check() -> Result<()> {
     let conf = NetConf::parse(&args.stdin_data)?;
     
     // Create plugin and check network
-    let plugin = VlanPlugin::new(conf, args);
-    plugin.check_network()?;
+    let mut plugin = VlanPlugin::new(conf, args);
+    
+    // Create a runtime to execute async code
+    let runtime = Runtime::new().context("Failed to create Tokio runtime")?;
+    runtime.block_on(plugin.check_network())?;
     
     Ok(())
 }
@@ -110,6 +119,7 @@ pub fn run_cni() -> Result<()> {
     let cmd = env::var("CNI_COMMAND")
         .context("CNI_COMMAND not found in environment")?;
     
+    // Execute the appropriate command
     match cmd.as_str() {
         "ADD" => cmd_add(),
         "DEL" => cmd_del(),
@@ -119,8 +129,6 @@ pub fn run_cni() -> Result<()> {
             println!(r#"{{"cniVersion":"1.0.0","supportedVersions":["0.3.0","0.3.1","0.4.0","1.0.0"]}}"#);
             Ok(())
         },
-        _ => {
-            anyhow::bail!("Unknown CNI_COMMAND: {}", cmd);
-        }
+        _ => anyhow::bail!("Unknown CNI command: {}", cmd),
     }
 }

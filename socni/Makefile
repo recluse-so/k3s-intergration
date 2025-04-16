@@ -2,10 +2,11 @@
 
 # Build binaries
 build:
-	cd socni && cargo build --release
+	cargo build --release
 	mkdir -p bin
-	cp socni/target/release/vlan-cni bin/vlan
-	cp socni/target/release/socni-ctl bin/socni-ctl
+	cp ./target/release/socni bin/vlan
+	cp ./target/release/socni-ctl bin/socni-ctl
+	chmod +x bin/vlan bin/socni-ctl
 
 # Build Docker image
 docker-build:

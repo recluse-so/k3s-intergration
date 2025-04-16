@@ -10,6 +10,7 @@ pub mod config;
 pub mod plugin;
 pub mod types;
 pub mod commands;
+pub mod integrations;
 
 // Re-export commonly used items
 pub use config::NetConf;

@@ -1,7 +1,8 @@
 use anyhow::Result;
 use tracing_subscriber::{FmtSubscriber, EnvFilter};
-use tracing::{error, Level};
-use vlan_cni::commands::run_cni;
+use tracing::{info, error, Level};
+use socni::commands::run_cni;
+use socni::types::{CmdArgs, Result as CniResult};
 
 fn main() -> Result<()> {
     // Set up tracing
@@ -11,6 +12,10 @@ fn main() -> Result<()> {
         .finish();
     
     let _ = tracing::subscriber::set_global_default(subscriber);
+    
+    // Log Aranya integration details
+    info!("SOCNI CNI plugin starting with Aranya security integration");
+    info!("This plugin enforces fine-grained network security policies via Aranya");
     
     // Run the CNI plugin
     if let Err(err) = run_cni() {
