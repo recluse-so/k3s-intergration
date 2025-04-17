@@ -1,4 +1,4 @@
-.PHONY: build docker-build deploy clean install
+.PHONY: build docker-build deploy clean install install-cli
 
 # Build binaries
 build:
@@ -18,7 +18,7 @@ deploy:
 
 # Create network attachment definitions
 create-networks:
-	kubectl apply -f deployments/network-attachment-definitions/
+	kubectl apply -f manifests/deployments/network-attachment-definitions/
 
 # Install CNI plugin locally
 install: build
@@ -27,17 +27,18 @@ install: build
 	sudo chmod +x /opt/cni/bin/vlan
 	sudo cp bin/socni-ctl /usr/local/bin/
 	sudo chmod +x /usr/local/bin/socni-ctl
-	sudo socni/scripts/install.sh
+	sudo ./scripts/install-cni.sh
 
 # Install CLI tool only
 install-cli: build
 	sudo cp bin/socni-ctl /usr/local/bin/
 	sudo chmod +x /usr/local/bin/socni-ctl
+	sudo ./scripts/install-cli.sh
 
 # Clean up
 clean:
-	kubectl delete -f deployments/daemonset.yaml || true
-	kubectl delete -f deployments/configmap.yaml || true
-	kubectl delete -f deployments/rbac.yaml || true
+	kubectl delete -f manifests/deployments/daemonset.yaml || true
+	kubectl delete -f manifests/deployments/configmap.yaml || true
+	kubectl delete -f manifests/deployments/rbac.yaml || true
 	rm -rf bin
 	cd socni && cargo clean

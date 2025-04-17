@@ -1,18 +1,20 @@
 #!/bin/bash
 set -e
 
-# Installation script for VLAN CNI plugin
-
-# Default paths
-CNI_BIN_DIR=${CNI_BIN_DIR:-/opt/cni/bin}
-CNI_CONF_DIR=${CNI_CONF_DIR:-/etc/cni/net.d}
-VLAN_CNI_STATE_DIR=${VLAN_CNI_STATE_DIR:-/var/lib/vlan-cni}
+# SOCNI Kubernetes Installation Script
+# This script installs SOCNI in a Kubernetes environment
 
 # Colors for output
 GREEN='\033[0;32m'
 RED='\033[0;31m'
 YELLOW='\033[0;33m'
+BLUE='\033[0;34m'
 NC='\033[0m' # No Color
+
+# Default paths
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SOCNI_DIR="$(dirname "$SCRIPT_DIR")"
+MANIFESTS_DIR="$SOCNI_DIR/manifests"
 
 # Ensure running as root
 if [ "$EUID" -ne 0 ]; then
@@ -20,38 +22,55 @@ if [ "$EUID" -ne 0 ]; then
   exit 1
 fi
 
+# Display banner
+echo -e "${BLUE}======================================================${NC}"
+echo -e "${BLUE}         SOCNI Kubernetes Installation Script         ${NC}"
+echo -e "${BLUE}======================================================${NC}"
+echo ""
+
 # Create log file
-LOG_FILE=/var/log/vlan-cni-install.log
-echo "Starting VLAN CNI plugin installation at $(date)" > $LOG_FILE
+LOG_FILE=/var/log/socni-k8s-install.log
+echo "Starting SOCNI Kubernetes installation at $(date)" > $LOG_FILE
 
-# Create directories
-echo -e "${GREEN}Creating directories...${NC}"
-mkdir -p $CNI_BIN_DIR
-mkdir -p $CNI_CONF_DIR
-mkdir -p $VLAN_CNI_STATE_DIR
-
-# Copy binary
-BINARY_PATH=$(dirname $0)/../target/release/vlan-cni
-if [ ! -f "$BINARY_PATH" ]; then
-  echo -e "${RED}Binary not found at $BINARY_PATH${NC}"
-  echo -e "${YELLOW}Building binary...${NC}"
-  
-  # Navigate to project root and build
-  cd $(dirname $0)/..
-  cargo build --release >> $LOG_FILE 2>&1
-  BINARY_PATH=./target/release/vlan-cni
+# Check if kubectl is available
+if ! command -v kubectl &> /dev/null; then
+  echo -e "${RED}kubectl is not installed or not in PATH${NC}"
+  echo "ERROR: kubectl is not installed or not in PATH" >> $LOG_FILE
+  exit 1
 fi
 
-echo -e "${GREEN}Installing VLAN CNI plugin to $CNI_BIN_DIR...${NC}"
-cp $BINARY_PATH $CNI_BIN_DIR/vlan
-chmod +x $CNI_BIN_DIR/vlan
-echo "Installed VLAN CNI binary to $CNI_BIN_DIR/vlan" >> $LOG_FILE
+# Check if we can connect to the Kubernetes cluster
+if ! kubectl cluster-info &> /dev/null; then
+  echo -e "${RED}Cannot connect to Kubernetes cluster${NC}"
+  echo "ERROR: Cannot connect to Kubernetes cluster" >> $LOG_FILE
+  exit 1
+fi
 
-# Create default configuration if it doesn't exist
-DEFAULT_CONF_PATH=$CNI_CONF_DIR/10-vlan.conflist
-if [ ! -f "$DEFAULT_CONF_PATH" ]; then
-  echo -e "${GREEN}Creating default configuration...${NC}"
-  cat > $DEFAULT_CONF_PATH << EOF
+# Build the binaries if needed
+if [ ! -f "$SOCNI_DIR/bin/vlan" ] || [ ! -f "$SOCNI_DIR/bin/socni-ctl" ]; then
+  echo -e "${YELLOW}Binaries not found. Building SOCNI...${NC}"
+  cd "$SOCNI_DIR"
+  cargo build --release
+  mkdir -p bin
+  cp ./target/release/socni bin/vlan
+  cp ./target/release/socni-ctl bin/socni-ctl
+  chmod +x bin/vlan bin/socni-ctl
+  echo "Built SOCNI binaries" >> $LOG_FILE
+fi
+
+# Create a ConfigMap with the CNI binary
+echo -e "${GREEN}Creating ConfigMap with CNI binary...${NC}"
+kubectl create configmap socni-cni-binary --from-file="$SOCNI_DIR/bin/vlan" -o yaml --dry-run=client | kubectl apply -f -
+echo "Created ConfigMap with CNI binary" >> $LOG_FILE
+
+# Create a ConfigMap with the CLI binary
+echo -e "${GREEN}Creating ConfigMap with CLI binary...${NC}"
+kubectl create configmap socni-cli-binary --from-file="$SOCNI_DIR/bin/socni-ctl" -o yaml --dry-run=client | kubectl apply -f -
+echo "Created ConfigMap with CLI binary" >> $LOG_FILE
+
+# Create default CNI configuration
+echo -e "${GREEN}Creating default CNI configuration...${NC}"
+cat > /tmp/10-vlan.conflist << EOF
 {
   "cniVersion": "1.0.0",
   "name": "vlan-cni",
@@ -68,39 +87,125 @@ if [ ! -f "$DEFAULT_CONF_PATH" ]; then
   ]
 }
 EOF
-  echo "Created default configuration at $DEFAULT_CONF_PATH" >> $LOG_FILE
-fi
 
-# Set up host VLAN interfaces if needed
-echo -e "${GREEN}Setting up host VLAN interfaces...${NC}"
-MASTER_INTERFACE=$(jq -r '.plugins[0].master' $DEFAULT_CONF_PATH 2>/dev/null || echo "eth0")
-VLAN_ID=$(jq -r '.plugins[0].vlan' $DEFAULT_CONF_PATH 2>/dev/null || echo "100")
-VLAN_INTERFACE="${MASTER_INTERFACE}.${VLAN_ID}"
+kubectl create configmap socni-cni-config --from-file=/tmp/10-vlan.conflist -o yaml --dry-run=client | kubectl apply -f -
+echo "Created ConfigMap with CNI configuration" >> $LOG_FILE
 
-# Check if master interface exists
-if ip link show dev $MASTER_INTERFACE &>/dev/null; then
-  # Check if VLAN interface already exists
-  if ! ip link show dev $VLAN_INTERFACE &>/dev/null; then
-    echo -e "${GREEN}Creating VLAN interface $VLAN_INTERFACE...${NC}"
-    ip link add link $MASTER_INTERFACE name $VLAN_INTERFACE type vlan id $VLAN_ID
-    ip link set dev $VLAN_INTERFACE up
-    echo "Created VLAN interface $VLAN_INTERFACE" >> $LOG_FILE
-  else
-    echo -e "${YELLOW}VLAN interface $VLAN_INTERFACE already exists${NC}"
-  fi
+# Create the DaemonSet
+echo -e "${GREEN}Deploying SOCNI DaemonSet...${NC}"
+if [ -f "$MANIFESTS_DIR/daemonset.yaml" ]; then
+  kubectl apply -f "$MANIFESTS_DIR/daemonset.yaml"
+  echo "Deployed SOCNI DaemonSet from $MANIFESTS_DIR/daemonset.yaml" >> $LOG_FILE
 else
-  echo -e "${RED}Master interface $MASTER_INTERFACE does not exist${NC}"
-  echo "WARNING: Master interface $MASTER_INTERFACE does not exist" >> $LOG_FILE
+  # Create a basic DaemonSet if the manifest doesn't exist
+  cat > /tmp/socni-daemonset.yaml << EOF
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: socni-installer
+  namespace: kube-system
+  labels:
+    app: socni-installer
+spec:
+  selector:
+    matchLabels:
+      app: socni-installer
+  template:
+    metadata:
+      labels:
+        app: socni-installer
+    spec:
+      containers:
+      - name: socni-installer
+        image: busybox
+        command: ["/bin/sh", "-c"]
+        args:
+        - |
+          mkdir -p /opt/cni/bin /etc/cni/net.d
+          cp /socni-cni-binary/vlan /opt/cni/bin/
+          cp /socni-cni-config/10-vlan.conflist /etc/cni/net.d/
+          chmod +x /opt/cni/bin/vlan
+          while true; do sleep 3600; done
+        volumeMounts:
+        - name: cni-binary
+          mountPath: /socni-cni-binary
+        - name: cni-config
+          mountPath: /socni-cni-config
+        - name: cni-bin-dir
+          mountPath: /opt/cni/bin
+        - name: cni-conf-dir
+          mountPath: /etc/cni/net.d
+      volumes:
+      - name: cni-binary
+        configMap:
+          name: socni-cni-binary
+      - name: cni-config
+        configMap:
+          name: socni-cni-config
+      - name: cni-bin-dir
+        hostPath:
+          path: /opt/cni/bin
+      - name: cni-conf-dir
+        hostPath:
+          path: /etc/cni/net.d
+EOF
+  kubectl apply -f /tmp/socni-daemonset.yaml
+  echo "Created and deployed basic SOCNI DaemonSet" >> $LOG_FILE
 fi
 
-# Label the node if running in Kubernetes
-if [ -n "$KUBERNETES_SERVICE_HOST" ]; then
-  echo -e "${GREEN}Running in Kubernetes, labeling node...${NC}"
-  NODE_NAME=$(hostname)
-  kubectl label node $NODE_NAME --overwrite vlan.cni.kubernetes.io/enabled=true
-  kubectl label node $NODE_NAME --overwrite vlan.cni.kubernetes.io/vlan-$VLAN_ID=true
-  echo "Labeled node $NODE_NAME with VLAN capability" >> $LOG_FILE
+# Create network attachment definitions
+echo -e "${GREEN}Creating network attachment definitions...${NC}"
+if [ -d "$MANIFESTS_DIR/network-attachment-definitions" ]; then
+  kubectl apply -f "$MANIFESTS_DIR/network-attachment-definitions/"
+  echo "Created network attachment definitions" >> $LOG_FILE
+else
+  # Create a basic network attachment definition if the directory doesn't exist
+  cat > /tmp/vlan100.yaml << EOF
+apiVersion: k8s.cni.cncf.io/v1
+kind: NetworkAttachmentDefinition
+metadata:
+  name: vlan100
+  namespace: default
+spec:
+  config: '{
+    "type": "vlan",
+    "master": "eth0",
+    "vlan": 100,
+    "ipam": {
+      "type": "host-local",
+      "subnet": "10.10.0.0/24"
+    }
+  }'
+EOF
+  kubectl apply -f /tmp/vlan100.yaml
+  echo "Created basic network attachment definition" >> $LOG_FILE
 fi
 
-echo -e "${GREEN}VLAN CNI plugin installation complete!${NC}"
+# Wait for the DaemonSet to be ready
+echo -e "${GREEN}Waiting for SOCNI DaemonSet to be ready...${NC}"
+kubectl rollout status daemonset/socni-installer -n kube-system
+echo "SOCNI DaemonSet is ready" >> $LOG_FILE
+
+# Label the nodes
+echo -e "${GREEN}Labeling nodes with VLAN capability...${NC}"
+for node in $(kubectl get nodes -o jsonpath='{.items[*].metadata.name}'); do
+  kubectl label node $node --overwrite vlan.cni.kubernetes.io/enabled=true
+  kubectl label node $node --overwrite vlan.cni.kubernetes.io/vlan-100=true
+  echo "Labeled node $node with VLAN capability" >> $LOG_FILE
+done
+
+echo -e "${GREEN}SOCNI Kubernetes installation complete!${NC}"
 echo "Installation completed at $(date)" >> $LOG_FILE
+
+# Final message
+echo -e "${GREEN}===============================================${NC}"
+echo -e "${GREEN}SOCNI Kubernetes installation completed successfully!${NC}"
+echo -e "${GREEN}===============================================${NC}"
+echo ""
+echo -e "${YELLOW}To verify the installation:${NC}"
+echo -e "${BLUE}kubectl get pods -n kube-system | grep socni-installer${NC}"
+echo -e "${BLUE}kubectl get network-attachment-definitions${NC}"
+echo ""
+echo -e "${YELLOW}To create a pod with VLAN access:${NC}"
+echo -e "${BLUE}kubectl run test-pod --image=busybox --overrides='{\"spec\":{\"annotations\":{\"k8s.v1.cni.cncf.io/networks\":\"vlan100\"}}}' -- sleep 3600${NC}"
+echo "" 
