@@ -1,0 +1,81 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: tenant-a-pod
+  labels:
+    tenant: tenant-a
+  annotations:
+    k8s.v1.cni.cncf.io/networks: kube-system/socni-vlan-tenant-a
+spec:
+  containers:
+  - name: tenant-a
+    image: busybox
+    command: ["sleep", "3600"]
+    resources:
+      limits:
+        memory: "128Mi"
+        cpu: "100m"
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: tenant-b-pod
+  labels:
+    tenant: tenant-b
+  annotations:
+    k8s.v1.cni.cncf.io/networks: kube-system/socni-vlan-tenant-b
+spec:
+  containers:
+  - name: tenant-b
+    image: busybox
+    command: ["sleep", "3600"]
+    resources:
+      limits:
+        memory: "128Mi"
+        cpu: "100m"
+---
+apiVersion: "k8s.cni.cncf.io/v1"
+kind: NetworkAttachmentDefinition
+metadata:
+  name: socni-vlan-tenant-a
+  namespace: kube-system
+spec:
+  config: '{
+    "type": "vlan",
+    "vlanId": 101,
+    "mtu": 1500,
+    "ipam": {
+      "type": "host-local",
+      "subnet": "10.43.0.0/16",
+      "routes": [
+        { "dst": "0.0.0.0/0" }
+      ]
+    },
+    "policy": {
+      "securityLevel": "High",
+      "accessType": "Isolated"
+    }
+  }'
+---
+apiVersion: "k8s.cni.cncf.io/v1"
+kind: NetworkAttachmentDefinition
+metadata:
+  name: socni-vlan-tenant-b
+  namespace: kube-system
+spec:
+  config: '{
+    "type": "vlan",
+    "vlanId": 102,
+    "mtu": 1500,
+    "ipam": {
+      "type": "host-local",
+      "subnet": "10.44.0.0/16",
+      "routes": [
+        { "dst": "0.0.0.0/0" }
+      ]
+    },
+    "policy": {
+      "securityLevel": "Medium",
+      "accessType": "Restricted"
+    }
+  }' 

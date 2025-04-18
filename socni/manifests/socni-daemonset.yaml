@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: socni
+  namespace: kube-system
+  labels:
+    app: socni
+    tier: networking
+spec:
+  selector:
+    matchLabels:
+      app: socni
+  template:
+    metadata:
+      labels:
+        app: socni
+    spec:
+      hostNetwork: true
+      priorityClassName: system-node-critical
+      containers:
+      - name: socni
+        image: socni:latest
+        imagePullPolicy: IfNotPresent
+        command: ["/entrypoint.sh", "cni"]
+        securityContext:
+          privileged: true
+        volumeMounts:
+        - name: cni-bin
+          mountPath: /opt/cni/bin
+        - name: cni-conf
+          mountPath: /etc/cni/net.d
+        - name: host-net
+          mountPath: /host
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 200m
+            memory: 256Mi
+      volumes:
+      - name: cni-bin
+        hostPath:
+          path: /opt/cni/bin
+      - name: cni-conf
+        hostPath:
+          path: /etc/cni/net.d
+      - name: host-net
+        hostPath:
+          path: /
+      tolerations:
+      - key: node-role.kubernetes.io/master
+        operator: Exists
+        effect: NoSchedule
+      - key: node-role.kubernetes.io/control-plane
+        operator: Exists
+        effect: NoSchedule 

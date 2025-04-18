@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: socni-config
+  namespace: kube-system
+data:
+  # Default VLAN configuration
+  vlan-config.json: |
+    {
+      "type": "vlan",
+      "vlanId": 100,
+      "mtu": 1500,
+      "ipam": {
+        "type": "host-local",
+        "subnet": "10.42.0.0/16",
+        "routes": [
+          { "dst": "0.0.0.0/0" }
+        ]
+      }
+    }
+  
+  # Default policy configuration
+  policy-config.json: |
+    {
+      "defaultSecurityLevel": "Medium",
+      "defaultAccessType": "Isolated",
+      "allowCrossTenantAccess": false
+    } 

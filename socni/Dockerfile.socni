@@ -8,28 +8,11 @@ RUN apt-get update && \
     apt-get install -y pkg-config libssl-dev build-essential git && \
     rm -rf /var/lib/apt/lists/*
 
-# Copy Cargo.toml and Cargo.lock first for better caching
-COPY socni/Cargo.toml socni/Cargo.lock* ./
+# Copy the entire project for proper dependency resolution
+COPY . .
 
-# Create a dummy src directory with minimal content to cache dependencies
-RUN mkdir src && \
-    echo "fn main() {println!(\"dummy\");}" > src/lib.rs && \
-    echo "fn main() {println!(\"dummy\");}" > src/bin/vlan-cni.rs && \
-    echo "fn main() {println!(\"dummy\");}" > src/bin/socni-ctl/main.rs && \
-    mkdir -p src/config src/plugin src/types src/commands && \
-    touch src/config/mod.rs src/plugin/mod.rs src/types/mod.rs src/commands/mod.rs
-
-# Build dependencies only
-RUN cargo build --release
-
-# Remove the dummy source files
-RUN rm -rf src
-
-# Copy the actual source code
-COPY socni/src ./src
-
-# Build the actual binaries
-RUN cargo build --release
+# Build the binaries
+RUN cd socni && cargo build --release
 
 # Final stage
 FROM debian:bookworm-slim
@@ -45,16 +28,33 @@ RUN apt-get update && \
 RUN mkdir -p /opt/cni/bin /etc/cni/net.d
 
 # Copy binaries from builder stage
-COPY --from=builder /workspace/target/release/vlan-cni /opt/cni/bin/vlan
-COPY --from=builder /workspace/target/release/socni-ctl /usr/local/bin/socni-ctl
+COPY --from=builder /workspace/socni/target/release/socni /opt/cni/bin/vlan
+COPY --from=builder /workspace/socni/target/release/socni-ctl /usr/local/bin/socni-ctl
 
 # Make binaries executable
 RUN chmod +x /opt/cni/bin/vlan /usr/local/bin/socni-ctl
 
-# Copy installation script
-COPY socni/scripts/install.sh /install.sh
-RUN chmod +x /install.sh
+# Copy installation scripts
+COPY socni/scripts/install-cni.sh /install-cni.sh
+COPY socni/scripts/install-cli.sh /install-cli.sh
+RUN chmod +x /install-cni.sh /install-cli.sh
 
-# By default, show usage information
-ENTRYPOINT ["/bin/bash", "-c"]
-CMD ["echo 'VLAN CNI Plugin Container'; echo ''; echo 'Available commands:'; echo '  - /install.sh                 # Run the installation script'; echo '  - /opt/cni/bin/vlan          # Run the CNI plugin directly'; echo '  - socni-ctl --help          # Show CLI tool help'"]
+# Create a wrapper script that can handle different installation options
+RUN echo '#!/bin/bash\n\
+if [ "$1" = "cni" ]; then\n\
+  /install-cni.sh\n\
+elif [ "$1" = "cli" ]; then\n\
+  /install-cli.sh\n\
+else\n\
+  echo "VLAN CNI Plugin Container"\n\
+  echo ""\n\
+  echo "Available commands:"\n\
+  echo "  - /install-cni.sh                 # Install the CNI plugin"\n\
+  echo "  - /install-cli.sh                 # Install the CLI tool"\n\
+  echo "  - /opt/cni/bin/vlan              # Run the CNI plugin directly"\n\
+  echo "  - socni-ctl --help               # Show CLI tool help"\n\
+fi' > /entrypoint.sh && chmod +x /entrypoint.sh
+
+# Set the entrypoint
+ENTRYPOINT ["/entrypoint.sh"]
+CMD []

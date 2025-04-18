@@ -1,0 +1,18 @@
+apiVersion: "k8s.cni.cncf.io/v1"
+kind: NetworkAttachmentDefinition
+metadata:
+  name: socni-vlan
+  namespace: kube-system
+spec:
+  config: '{
+    "type": "vlan",
+    "vlanId": 100,
+    "mtu": 1500,
+    "ipam": {
+      "type": "host-local",
+      "subnet": "10.42.0.0/16",
+      "routes": [
+        { "dst": "0.0.0.0/0" }
+      ]
+    }
+  }' 
