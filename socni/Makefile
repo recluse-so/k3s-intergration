@@ -27,13 +27,13 @@ install: build
 	sudo chmod +x /opt/cni/bin/vlan
 	sudo cp bin/socni-ctl /usr/local/bin/
 	sudo chmod +x /usr/local/bin/socni-ctl
-	sudo ./scripts/install-cni.sh
+	sudo bash scripts/install-cni.sh
 
 # Install CLI tool only
 install-cli: build
 	sudo cp bin/socni-ctl /usr/local/bin/
 	sudo chmod +x /usr/local/bin/socni-ctl
-	sudo ./scripts/install-cli.sh
+	sudo bash scripts/install-cli.sh
 
 # Clean up
 clean:

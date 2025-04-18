@@ -32,6 +32,15 @@ SOCNI is a Container Network Interface (CNI) plugin that creates and manages VLA
 - Valid Aranya tenant configuration
 - Network connectivity between nodes for policy synchronization
 
+### Multus CNI
+
+- Multus CNI v3.9.0 or later
+- Required for managing multiple network interfaces in Kubernetes pods
+- Enables SOCNI to work alongside other CNI plugins
+- Provides the NetworkAttachmentDefinition CRD for VLAN configuration
+- [Multus CNI GitHub Repository](https://github.com/k8snetworkplumbingwg/multus-cni)
+- [Multus CNI Documentation](https://github.com/k8snetworkplumbingwg/multus-cni/blob/master/docs/quickstart.md)
+
 ## Installation
 
 ### Manual Installation
@@ -318,18 +327,35 @@ socni-ctl diagnostics
 
 ## Architecture
 
-SOCNI consists of:
+SOCNI consists of several components working together to provide secure network isolation:
 
-1. **CNI Plugin**: The VLAN network plugin that integrates with Kubernetes
-2. **Aranya Client**: Integration with Aranya's policy engine for access control
-3. **Command-Line Tools**: Tools for VLAN management and policy configuration
+1. **VLAN CNI Plugin**
+   - Core network plugin implementing VLAN functionality
+   - Handles pod network interface creation and configuration
+   - Manages VLAN tagging and network isolation
 
-The security architecture ensures:
+2. **Multus CNI Integration**
+   - Acts as a meta-plugin to manage multiple network interfaces
+   - Allows pods to have both primary and secondary networks
+   - Enables SOCNI to work alongside other CNI plugins
+   - Provides NetworkAttachmentDefinition CRD for VLAN configuration
+   - Handles network interface attachment and detachment
 
-- Network isolation between pods and VLANs
-- Fine-grained access control based on identity
-- Cryptographic verification of access rights
-- Consistent network configuration across nodes
+3. **SOCNI-CTL Tool**
+   - Command-line interface for management
+   - Handles configuration and monitoring
+   - Provides troubleshooting capabilities
+
+4. **Kubernetes Integration**
+   - DaemonSet for deploying the CNI plugin
+   - NetworkAttachmentDefinition for VLAN configuration
+   - Integration with Kubernetes networking
+
+The architecture follows this flow:
+1. Multus CNI manages the primary network interface
+2. SOCNI plugin handles VLAN configuration and isolation
+3. NetworkAttachmentDefinition defines VLAN parameters
+4. Pods can request VLAN networks through annotations
 
 ## Contributing
 

@@ -46,6 +46,16 @@ if ! kubectl cluster-info &> /dev/null; then
   exit 1
 fi
 
+# Install Multus CNI plugin
+echo -e "${GREEN}Installing Multus CNI plugin...${NC}"
+kubectl apply -f https://raw.githubusercontent.com/k8snetworkplumbingwg/multus-cni/master/deployments/multus-daemonset-thick.yml
+echo "Installed Multus CNI plugin" >> $LOG_FILE
+
+# Wait for Multus to be ready
+echo -e "${GREEN}Waiting for Multus to be ready...${NC}"
+kubectl rollout status daemonset/kube-multus-ds -n kube-system
+echo "Multus is ready" >> $LOG_FILE
+
 # Build the binaries if needed
 if [ ! -f "$SOCNI_DIR/bin/vlan" ] || [ ! -f "$SOCNI_DIR/bin/socni-ctl" ]; then
   echo -e "${YELLOW}Binaries not found. Building SOCNI...${NC}"
@@ -57,16 +67,6 @@ if [ ! -f "$SOCNI_DIR/bin/vlan" ] || [ ! -f "$SOCNI_DIR/bin/socni-ctl" ]; then
   chmod +x bin/vlan bin/socni-ctl
   echo "Built SOCNI binaries" >> $LOG_FILE
 fi
-
-# Create a ConfigMap with the CNI binary
-echo -e "${GREEN}Creating ConfigMap with CNI binary...${NC}"
-kubectl create configmap socni-cni-binary --from-file="$SOCNI_DIR/bin/vlan" -o yaml --dry-run=client | kubectl apply -f -
-echo "Created ConfigMap with CNI binary" >> $LOG_FILE
-
-# Create a ConfigMap with the CLI binary
-echo -e "${GREEN}Creating ConfigMap with CLI binary...${NC}"
-kubectl create configmap socni-cli-binary --from-file="$SOCNI_DIR/bin/socni-ctl" -o yaml --dry-run=client | kubectl apply -f -
-echo "Created ConfigMap with CLI binary" >> $LOG_FILE
 
 # Create default CNI configuration
 echo -e "${GREEN}Creating default CNI configuration...${NC}"
@@ -122,23 +122,18 @@ spec:
         args:
         - |
           mkdir -p /opt/cni/bin /etc/cni/net.d
-          cp /socni-cni-binary/vlan /opt/cni/bin/
           cp /socni-cni-config/10-vlan.conflist /etc/cni/net.d/
-          chmod +x /opt/cni/bin/vlan
           while true; do sleep 3600; done
         volumeMounts:
-        - name: cni-binary
-          mountPath: /socni-cni-binary
         - name: cni-config
           mountPath: /socni-cni-config
         - name: cni-bin-dir
           mountPath: /opt/cni/bin
         - name: cni-conf-dir
           mountPath: /etc/cni/net.d
+        - name: cni-binary
+          mountPath: /socni-binary
       volumes:
-      - name: cni-binary
-        configMap:
-          name: socni-cni-binary
       - name: cni-config
         configMap:
           name: socni-cni-config
@@ -148,24 +143,37 @@ spec:
       - name: cni-conf-dir
         hostPath:
           path: /etc/cni/net.d
+      - name: cni-binary
+        hostPath:
+          path: $SOCNI_DIR/bin
 EOF
   kubectl apply -f /tmp/socni-daemonset.yaml
   echo "Created and deployed basic SOCNI DaemonSet" >> $LOG_FILE
 fi
 
+# Wait for Multus CRDs to be ready
+echo -e "${GREEN}Waiting for Multus CRDs to be ready...${NC}"
+kubectl wait --for=condition=established --timeout=60s crd/network-attachment-definitions.k8s.cni.cncf.io
+echo "Multus CRDs are ready" >> $LOG_FILE
+
 # Create network attachment definitions
 echo -e "${GREEN}Creating network attachment definitions...${NC}"
 if [ -d "$MANIFESTS_DIR/network-attachment-definitions" ]; then
+  # Create namespace if it doesn't exist
+  kubectl create namespace secure-zone-1 --dry-run=client -o yaml | kubectl apply -f -
   kubectl apply -f "$MANIFESTS_DIR/network-attachment-definitions/"
   echo "Created network attachment definitions" >> $LOG_FILE
 else
+  # Create namespace if it doesn't exist
+  kubectl create namespace secure-zone-1 --dry-run=client -o yaml | kubectl apply -f -
+  
   # Create a basic network attachment definition if the directory doesn't exist
   cat > /tmp/vlan100.yaml << EOF
 apiVersion: k8s.cni.cncf.io/v1
 kind: NetworkAttachmentDefinition
 metadata:
   name: vlan100
-  namespace: default
+  namespace: secure-zone-1
 spec:
   config: '{
     "type": "vlan",
@@ -183,8 +191,14 @@ fi
 
 # Wait for the DaemonSet to be ready
 echo -e "${GREEN}Waiting for SOCNI DaemonSet to be ready...${NC}"
-kubectl rollout status daemonset/socni-installer -n kube-system
-echo "SOCNI DaemonSet is ready" >> $LOG_FILE
+# First check if the DaemonSet exists
+if kubectl get daemonset socni-installer -n kube-system &> /dev/null; then
+  kubectl rollout status daemonset/socni-installer -n kube-system
+  echo "SOCNI DaemonSet is ready" >> $LOG_FILE
+else
+  echo -e "${YELLOW}Warning: SOCNI DaemonSet not found. This might be normal if it's still being created.${NC}"
+  echo "Warning: SOCNI DaemonSet not found" >> $LOG_FILE
+fi
 
 # Label the nodes
 echo -e "${GREEN}Labeling nodes with VLAN capability...${NC}"
@@ -204,8 +218,8 @@ echo -e "${GREEN}===============================================${NC}"
 echo ""
 echo -e "${YELLOW}To verify the installation:${NC}"
 echo -e "${BLUE}kubectl get pods -n kube-system | grep socni-installer${NC}"
-echo -e "${BLUE}kubectl get network-attachment-definitions${NC}"
+echo -e "${BLUE}kubectl get network-attachment-definitions -n secure-zone-1${NC}"
 echo ""
 echo -e "${YELLOW}To create a pod with VLAN access:${NC}"
-echo -e "${BLUE}kubectl run test-pod --image=busybox --overrides='{\"spec\":{\"annotations\":{\"k8s.v1.cni.cncf.io/networks\":\"vlan100\"}}}' -- sleep 3600${NC}"
+echo -e "${BLUE}kubectl run test-pod -n secure-zone-1 --image=busybox --overrides='{\"spec\":{\"annotations\":{\"k8s.v1.cni.cncf.io/networks\":\"vlan100\"}}}' -- sleep 3600${NC}"
 echo "" 
