@@ -2,11 +2,12 @@
 
 You're right - K3s uses Flannel as its default Container Network Interface (CNI) plugin. This presents a specific integration scenario for your SOCNI implementation. Here's how SOCNI works with Flannel in a K3s environment:
 
-## Flannel and SOCNI Coexistence 
+## Flannel and SOCNI Coexistence
 
 ### How Flannel Works in K3s
 
 Flannel in K3s:
+
 1. Creates an overlay network (typically VXLAN-based)
 2. Assigns pods to a flat network (10.42.0.0/16 by default)
 3. Handles pod-to-pod routing across nodes

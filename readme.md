@@ -2,7 +2,7 @@
 
 The Go implementation of the VLAN CNI plugin for Kubernetes is designed with a clean architecture that enables VLAN networking capabilities on both wired and wireless (WLAN) host interfaces. Let me elaborate on the architecture and how it specifically handles VLAN on WLAN integration:
 
-### Core Architecture Components
+## Core Architecture Components
 
 1. **Plugin Entry Point (`cmd/vlan-cni/main.go`)**:
    - Implements the standard CNI plugin interface (ADD, DEL, CHECK operations)
@@ -218,7 +218,6 @@ For example, if you have three namespaces (`default`, `secure-zone-1`, and `secu
    - Additional security measures may be needed for VLAN interfaces
 
 The fundamental networking isn't different - it's extended with physical network isolation capabilities. This approach gives you the best of both worlds: Kubernetes' powerful service discovery and network abstraction plus the security and isolation benefits of VLAN segmentation.
-
 
 ## How SOCNI and Aranya Enable Transport Layer Governance
 

@@ -36,11 +36,11 @@ The policy maintains the base roles from the default policy while adding tenant-
 
 **Invariants**:
 
-- Each tenant has its own isolated network space
-- Network access between tenants must be explicitly allowed
-- Tenant labels control network access within a tenant
-- A device can belong to multiple tenants with different roles
-- Tenant network policies are enforced at the CNI level
+* Each tenant has its own isolated network space
+* Network access between tenants must be explicitly allowed
+* Tenant labels control network access within a tenant
+* A device can belong to multiple tenants with different roles
+* Tenant network policies are enforced at the CNI level
 
 ### Imports & Global Constants
 
@@ -295,4 +295,4 @@ command AllowTenantAccess {
         }
     }
 }
-``` 
+```
