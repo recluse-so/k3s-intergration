@@ -15,8 +15,13 @@ Cargo.lock
 
 scratch/*
 .DS_Store
-/aranya-core
-/aranya
+aranya-core/*
+aranya/*
 minikube-darwin-arm64
 token.repo
 check-token.sh
+
+
+
+/aranya
+/aranya-core
