@@ -17,6 +17,25 @@ spec:
     spec:
       hostNetwork: true
       priorityClassName: system-node-critical
+      initContainers:
+      - name: key-setup
+        image: busybox:1.36
+        command: ['sh', '-c', 'mkdir -p /etc/aranya/keystore && chmod 700 /etc/aranya/keystore && cp /keys/* /etc/aranya/keystore/ && chmod 600 /etc/aranya/keystore/*']
+        volumeMounts:
+        - name: aranya-keystore
+          mountPath: /etc/aranya/keystore
+        - name: aranya-keys
+          mountPath: /keys
+          readOnly: true
+      - name: policy-setup
+        image: socni:latest
+        command: ['sh', '-c', 'mkdir -p /etc/aranya/policies && cp /policies/* /etc/aranya/policies/ && chmod 600 /etc/aranya/policies/*']
+        volumeMounts:
+        - name: aranya-policies
+          mountPath: /etc/aranya/policies
+        - name: policies-secret
+          mountPath: /policies
+          readOnly: true
       containers:
       - name: socni
         image: socni:latest
@@ -24,6 +43,13 @@ spec:
         command: ["/entrypoint.sh", "cni"]
         securityContext:
           privileged: true
+        env:
+        - name: ARANYA_DAEMON_ADDRESS
+          value: "unix:///run/aranya/aranya.sock"
+        - name: ARANYA_KEYSTORE_PATH
+          value: "/etc/aranya/keystore"
+        - name: ARANYA_POLICIES_PATH
+          value: "/etc/aranya/policies"
         volumeMounts:
         - name: cni-bin
           mountPath: /opt/cni/bin
@@ -31,6 +57,12 @@ spec:
           mountPath: /etc/cni/net.d
         - name: host-net
           mountPath: /host
+        - name: aranya-socket
+          mountPath: /run/aranya
+        - name: aranya-keystore
+          mountPath: /etc/aranya/keystore
+        - name: aranya-policies
+          mountPath: /etc/aranya/policies
         resources:
           requests:
             cpu: 100m
@@ -48,6 +80,24 @@ spec:
       - name: host-net
         hostPath:
           path: /
+      - name: aranya-socket
+        hostPath:
+          path: /run/aranya
+          type: DirectoryOrCreate
+      - name: aranya-keystore
+        hostPath:
+          path: /etc/aranya/keystore
+          type: DirectoryOrCreate
+      - name: aranya-policies
+        hostPath:
+          path: /etc/aranya/policies
+          type: DirectoryOrCreate
+      - name: aranya-keys
+        secret:
+          secretName: aranya-keys
+      - name: policies-secret
+        secret:
+          secretName: socni-policies
       tolerations:
       - key: node-role.kubernetes.io/master
         operator: Exists

@@ -352,6 +352,7 @@ SOCNI consists of several components working together to provide secure network 
    - Integration with Kubernetes networking
 
 The architecture follows this flow:
+
 1. Multus CNI manages the primary network interface
 2. SOCNI plugin handles VLAN configuration and isolation
 3. NetworkAttachmentDefinition defines VLAN parameters
@@ -364,3 +365,38 @@ We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for deta
 ## License
 
 This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details. 
+
+## Key Differences from Aranya
+
+### Integration Level
+
+- Most tools focus on one aspect (policies OR encryption OR isolation)
+- Aranya combines all three in a single solution
+
+### Complexity
+
+- Many solutions require multiple components
+- Aranya provides a simpler, unified approach
+
+### Performance
+
+- Some solutions add significant overhead
+- Aranya aims for minimal performance impact
+
+### Policy Management
+
+- Most tools use complex policy languages
+- Aranya uses simple JSON-based policies
+
+### Cryptographic Guarantees
+
+- Few solutions provide strong cryptographic guarantees
+- Aranya enforces encryption at the network level
+
+The main advantage of Aranya is that it combines these features in a single, cohesive solution rather than requiring multiple tools to be integrated. However, depending on your specific needs, one of these other tools might be more appropriate:
+
+- If you need simple network policies: **Calico**
+- If you want eBPF-based networking: **Cilium**
+- If you need lightweight encryption: **WireGuard**
+- If you need VM-based isolation: **KubeVirt**
+- If you need cloud-scale networking: **OpenStack Neutron**

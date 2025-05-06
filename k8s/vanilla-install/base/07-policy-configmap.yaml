@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: aranya-policy
+  namespace: aranya
+data:
+  policy-path: "/etc/aranya/policy/team-policy.md" 

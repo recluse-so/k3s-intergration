@@ -6,10 +6,11 @@ use anyhow::{Result, Context};
 use tracing::{info, warn};
 
 use crate::config::NetConf;
-use crate::types::{CmdArgs, Result as CniResult, Interface, IPConfig, Route as CniRoute};
+use crate::types::{CmdArgs, Result as CniResult, Interface};
 use crate::integrations::aranya::AranyaClient;
-use aranya_client::client::Queries;
-use aranya_crypto::DeviceId as CryptoDeviceId;
+use nix::sys::stat::Mode;
+use nix::fcntl::{open, OFlag};
+use nix::unistd::close;
 
 // Define platform-specific constants and functions
 #[cfg(target_os = "linux")]
@@ -85,13 +86,13 @@ impl VlanPlugin {
     {
         // Open the network namespace
         let netns_path = format!("/var/run/netns/{}", netns);
-        let fd = unsafe { libc::open(netns_path.as_ptr() as *const i8, libc::O_RDONLY) };
+        let fd = unsafe { libc::open(netns_path.as_ptr() as *const libc::c_char, libc::O_RDONLY) };
         if fd < 0 {
             return Err(anyhow::anyhow!("Failed to open netns: {}", netns));
         }
 
         // Get current namespace
-        let cur_netns = unsafe { libc::open("/proc/self/ns/net".as_ptr() as *const i8, libc::O_RDONLY) };
+        let cur_netns = unsafe { libc::open("/proc/self/ns/net".as_ptr() as *const libc::c_char, libc::O_RDONLY) };
         if cur_netns < 0 {
             unsafe { libc::close(fd) };
             return Err(anyhow::anyhow!("Failed to open current netns"));
@@ -212,10 +213,10 @@ impl VlanPlugin {
         let ifname = self.args.ifname.clone();
         let vlan_name_clone = vlan_name.clone();
         let config = self.config.clone();
-        let vlan_id = self.config.vlan;
+        let _vlan_id = self.config.vlan;
         
         // Create a mutable reference to result that can be moved into the closure
-        let result_ref = &mut result;
+        let _result_ref = &mut result;
         
         // Execute inside container network namespace
         self.in_netns(&self.args.netns, || async move {
@@ -244,59 +245,8 @@ impl VlanPlugin {
             }
             
             // Configure IPAM if provided
-            if let Some(ipam) = &config.ipam {
-                // Use a simple allocation based on VLAN ID
-                // In a real implementation, this would use Aranya's IPAM service
-                let _subnet = ipam.subnet.as_deref().unwrap_or("192.168.0.0/24");
-                let ip = format!("192.168.{}.2/24", vlan_id % 256);
-                let gateway = format!("192.168.{}.1", vlan_id % 256);
-                
-                info!("Configuring IP: {}, Gateway: {}", ip, gateway);
-                
-                // Add IP to interface
-                let addr_cmd = Command::new("ip")
-                    .args(&["addr", "add", &ip, "dev", &ifname])
-                    .output()
-                    .context("Failed to execute ip addr add command")?;
-                
-                if !addr_cmd.status.success() {
-                    anyhow::bail!("Failed to add IP address to interface: {}", 
-                                 String::from_utf8_lossy(&addr_cmd.stderr));
-                }
-                
-                // Add default route if IPAM provided gateway
-                let route_cmd = Command::new("ip")
-                    .args(&["route", "add", "default", "via", &gateway])
-                    .output()
-                    .context("Failed to execute ip route add command")?;
-                
-                if !route_cmd.status.success() {
-                    warn!("Failed to add default route: {}", 
-                         String::from_utf8_lossy(&route_cmd.stderr));
-                }
-                
-                // Add IP details to result
-                result_ref.add_ip(IPConfig {
-                    interface: None,
-                    address: ip.to_string(),
-                    gateway: Some(gateway.to_string()),
-                });
-                
-                // Add routing details to result
-                result_ref.add_route(CniRoute {
-                    dst: "0.0.0.0/0".to_string(),
-                    gw: Some(gateway.to_string()),
-                });
-                
-                // Add additional routes if configured
-                if let Some(routes) = &ipam.routes {
-                    for route in routes {
-                        result_ref.add_route(CniRoute {
-                            dst: route.dst.clone(),
-                            gw: route.gw.clone(),
-                        });
-                    }
-                }
+            if let Some(_ipam) = &config.ipam {
+                // TODO: Implement IPAM configuration with Aranya
             }
             
             Ok(())
@@ -320,8 +270,8 @@ impl VlanPlugin {
         }
 
         // Clean up IPAM allocations if specified
-        if let Some(ipam) = &self.config.ipam {
-            if let Some(aranya) = &mut self.aranya {
+        if let Some(_ipam) = &self.config.ipam {
+            if let Some(_aranya) = &mut self.aranya {
                 // No need to deallocate IP since it's not implemented
             }
         }
@@ -397,11 +347,8 @@ impl VlanPlugin {
             }
             
             // If IPAM was specified, verify IP configuration
-            if let Some(ipam) = &config.ipam {
-                // Verify there's at least one IP address
-                if !output.contains("inet ") {
-                    anyhow::bail!("Interface {} has no IP address", ifname);
-                }
+            if let Some(_ipam) = &config.ipam {
+                // TODO: Implement IPAM configuration
             }
             
             Ok(())

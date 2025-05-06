@@ -1,0 +1,36 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: aranya-factdb-restore
+  namespace: aranya
+spec:
+  template:
+    spec:
+      containers:
+      - name: restore
+        image: busybox:1.36
+        command: ["/bin/sh", "/scripts/restore.sh", "/backup/aranya-factdb-restore.tar.gz"]
+        volumeMounts:
+        - name: factdb-storage
+          mountPath: /var/lib/aranya
+        - name: backup-script
+          mountPath: /scripts
+        - name: backup-volume
+          mountPath: /backup
+        - name: uds-socket
+          mountPath: /var/run/aranya
+      volumes:
+      - name: factdb-storage
+        persistentVolumeClaim:
+          claimName: aranya-factdb
+      - name: backup-script
+        configMap:
+          name: aranya-backup-config
+          defaultMode: 0755
+      - name: backup-volume
+        persistentVolumeClaim:
+          claimName: aranya-backup-pvc
+      - name: uds-socket
+        emptyDir: {}
+      restartPolicy: Never
+  backoffLimit: 0 

@@ -1,0 +1,28 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: aranya-factdb-backup
+spec:
+  schedule: "0 4 * * *"  # Run at 4 AM daily in dev
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: backup
+            resources:
+              requests:
+                memory: "128Mi"
+                cpu: "50m"
+              limits:
+                memory: "256Mi"
+                cpu: "100m"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: aranya-backup-pvc
+spec:
+  resources:
+    requests:
+      storage: 10Gi 

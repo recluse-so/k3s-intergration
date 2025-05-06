@@ -1,3 +1,11 @@
+# Aranya Integration Guide
+
+## Executive Summary
+
+Aranya's micro-segmentation solution, built on a zero-trust framework, enables applications to maintain operational capability in contested network environments while ensuring data security and service availability. By reducing complexity in integrating security at the application design level, Aranya provides enterprise best-in-class protection against network threats. The Platform delivers a comprehensive solution that models network security with built-in operational resilience in contested environments.
+
+The Platform core implements end-to-end encryption, device-level authentication, and a domain-specific policy language for defining security controls. This ensures reliable encrypted data exchange across isolated network segments, preventing threat propagation while maintaining service availability during network attacks and enabling quick security policy updates without disruption. Through granular access control at the application layer and automated security policy enforcement, the Platform prevents unauthorized access while supporting dynamic responses to network degradation. This implementation of encrypted channels combined with policy-based resilience mechanisms ensures that critical services remain operational even in degraded network conditions. The platform's ability to maintain high availability of critical services while ensuring data security positions it as an essential tool for modern network defense. By combining built-in security features with operational resilience, Aranya enables organizations to maintain their operational capability while protecting against sophisticated network threats, ultimately providing a comprehensive solution for secure and reliable network operations in contested environments.
+
 # CNI Plugin Overview
 
 The Go implementation of the VLAN CNI plugin for Kubernetes is designed with a clean architecture that enables VLAN networking capabilities on both wired and wireless (WLAN) host interfaces. Let me elaborate on the architecture and how it specifically handles VLAN on WLAN integration:

@@ -1,5 +1,5 @@
 use anyhow::{Context, Result};
-use clap::{Parser, Subcommand, builder::TypedValueParser};
+use clap::{Parser, Subcommand};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::fs;
@@ -357,6 +357,9 @@ async fn main() -> Result<()> {
     
     match cli.command {
         Commands::Create { id, master, mtu, label } => {
+            let _master = master; // Mark as unused
+            let _mtu = mtu;      // Mark as unused
+            
             // Create VLAN in Aranya
             aranya.create_vlan(id)?;
             

@@ -108,7 +108,7 @@ mod tests {
         
         // Create VLAN config
         let vlan_id = 100;
-        let master = "eth0"; // Change to a real interface on your system
+        let master = "en0"; // Changed from eth0 to en0 for macOS compatibility
         
         // Check access using mock Aranya policy
         if !aranya.check_vlan_access(vlan_id)? {
@@ -186,7 +186,7 @@ mod tests {
         
         // Create VLAN config
         let vlan_id = 100;
-        let master = "eth0"; // Change to a real interface on your system
+        let master = "en0"; // Changed from eth0 to en0 for macOS compatibility
         
         // Check access using real Aranya policy
         if !aranya.check_vlan_access(vlan_id)? {

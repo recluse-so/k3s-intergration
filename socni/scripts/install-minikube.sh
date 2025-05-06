@@ -167,9 +167,42 @@ EOF
   echo -e "${GREEN}SOCNI installed in Minikube successfully.${NC}"
 }
 
+# Function to generate and create aranya keys
+generate_aranya_keys() {
+  echo -e "${YELLOW}Generating Aranya keys...${NC}"
+  
+  # Create output directory
+  mkdir -p ./aranya-keys
+  
+  # Generate control plane key
+  echo -e "${YELLOW}Generating control plane key...${NC}"
+  openssl genpkey -algorithm RSA -out ./aranya-keys/control-plane.key -pkeyopt rsa_keygen_bits:4096
+  openssl rsa -in ./aranya-keys/control-plane.key -pubout -out ./aranya-keys/control-plane.pub
+  
+  # Generate node keys
+  echo -e "${YELLOW}Generating node keys...${NC}"
+  mkdir -p ./aranya-keys/node-1
+  openssl genpkey -algorithm RSA -out ./aranya-keys/node-1/node.key -pkeyopt rsa_keygen_bits:4096
+  openssl rsa -in ./aranya-keys/node-1/node.key -pubout -out ./aranya-keys/node-1/node.pub
+  
+  # Create Kubernetes secret
+  echo -e "${YELLOW}Creating Kubernetes secret for Aranya keys...${NC}"
+  kubectl create secret generic aranya-keys \
+    --from-file=./aranya-keys/control-plane.key \
+    --from-file=./aranya-keys/control-plane.pub \
+    --from-file=./aranya-keys/node-1/node.key \
+    --from-file=./aranya-keys/node-1/node.pub \
+    -n kube-system
+  
+  echo -e "${GREEN}Aranya keys generated and secret created successfully.${NC}"
+}
+
 # Function to deploy SOCNI to Minikube
 deploy_socni() {
   echo -e "${YELLOW}Deploying SOCNI to Minikube...${NC}"
+  
+  # Generate and create Aranya keys first
+  generate_aranya_keys
   
   # Deploy the DaemonSet
   make deploy

@@ -1,0 +1,35 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: aranya-metrics
+  namespace: aranya
+spec:
+  selector:
+    matchLabels:
+      app: aranya-daemon
+  endpoints:
+  - port: metrics
+    interval: 15s
+    metricRelabelings:
+    - sourceLabels: [__name__]
+      regex: 'aranya_.*'
+      action: keep
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: aranya-prometheus-rules
+  namespace: aranya
+data:
+  aranya-rules.yaml: |
+    groups:
+    - name: aranya
+      rules:
+      - alert: AranyaDaemonDown
+        expr: kube_daemonset_status_number_ready{daemonset="aranya-daemon"} < kube_daemonset_status_desired_number_scheduled{daemonset="aranya-daemon"}
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: Aranya daemon is down
+          description: "Aranya daemon has been down for more than 5 minutes" 

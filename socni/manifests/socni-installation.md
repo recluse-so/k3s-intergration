@@ -134,4 +134,4 @@ kubectl exec -it -n kube-system $(kubectl get pods -n kube-system -l app=socni -
 
 ## Advanced Configuration
 
-For more advanced configuration options, refer to the SOCNI documentation and policy examples in the `policy-examples` directory. 
+For more advanced configuration options, refer to the SOCNI documentation and policy examples in the `policy-examples` directory.

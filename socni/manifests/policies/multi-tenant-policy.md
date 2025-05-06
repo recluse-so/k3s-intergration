@@ -1,0 +1,39 @@
+---
+policy-version: 2
+---
+
+# Multi-Tenant Policy
+
+## Roles & Permissions
+
+* Owner:
+  * Create/terminate Tenant
+  * Assign/revoke Tenant roles
+  * Define tenant network policies
+  * Manage tenant isolation
+
+* Admin:
+  * Manage tenant network access
+  * Define tenant labels
+  * Assign tenant roles
+
+* Operator:
+  * Manage tenant network configurations
+  * Assign tenant labels
+  * Configure tenant access
+
+* Member:
+  * Access tenant networks based on labels
+  * Create/delete tenant channels
+
+## Network Access Types
+
+* Isolated: No access to other tenants
+* Shared: Access to shared resources
+* Restricted: Limited access to specific tenants
+
+## Security Levels
+
+* High: Strict isolation, limited cross-tenant access
+* Medium: Standard isolation with controlled access
+* Low: Permissive access with basic isolation 

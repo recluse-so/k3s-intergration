@@ -334,3 +334,56 @@ data:
 6. **Shared Services**: Controlled ability to share specific VLANs across tenants
 
 This architecture combines the security of Aranya's cryptographic identity system with the network isolation of VLANs to create a truly multi-tenant environment with strong boundaries between tenants.
+
+## Running Tests with Aranya
+
+The tests require a running Aranya daemon with proper configuration and keystore setup. We provide scripts to help with this setup:
+
+### Setup Instructions
+
+1. Make the setup scripts executable:
+```bash
+chmod +x setup_aranya.sh setup_keystore.sh cleanup_aranya.sh
+```
+
+2. Build the Aranya daemon:
+```bash
+cd /Users/asaunders/githubRepos/k3s-intergration/aranya
+cargo build --release
+```
+
+3. Run the Aranya setup script:
+```bash
+sudo ./setup_aranya.sh
+```
+
+4. Run the keystore setup script:
+```bash
+sudo ./setup_keystore.sh
+```
+
+5. Start the Aranya daemon:
+```bash
+sudo /Users/asaunders/githubRepos/k3s-intergration/aranya/target/release/aranya-daemon /var/lib/aranya/config.json
+```
+
+6. In a new terminal, run the tests:
+```bash
+cd /Users/asaunders/githubRepos/k3s-intergration/socni
+cargo test
+```
+
+### Cleanup
+
+After running tests, you can clean up all Aranya-related files:
+```bash
+sudo ./cleanup_aranya.sh
+```
+
+### Troubleshooting
+
+If you encounter issues:
+1. Ensure the Aranya daemon is running: `ps aux | grep aranya-daemon`
+2. Check the keystore permissions: `ls -la /var/lib/aranya/keystore`
+3. Verify the configuration file: `cat /var/lib/aranya/config.json`
+4. Check for any error messages in the daemon output

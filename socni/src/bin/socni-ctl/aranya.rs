@@ -1,11 +1,13 @@
-use anyhow::{Context, Result};
+use anyhow::Result;
 use std::path::PathBuf;
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 
 /// Simplified Aranya client for the socni-ctl binary
 pub struct AranyaClient {
+    #[allow(dead_code)]
     socket_path: PathBuf,
+    #[allow(dead_code)]
     tenant_id: String,
     vlan_configs: Arc<Mutex<HashMap<u16, bool>>>,
 }

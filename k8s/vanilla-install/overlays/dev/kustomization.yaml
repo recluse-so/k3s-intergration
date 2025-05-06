@@ -1,0 +1,19 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: aranya-dev
+namePrefix: dev-
+
+resources:
+- ../../base
+
+patches:
+- path: patches/storage.yaml
+- path: patches/daemon.yaml
+- path: patches/backup.yaml
+
+configMapGenerator:
+- name: aranya-config
+  behavior: merge
+  literals:
+  - daemon.json={"name":"k3s-node-dev","work_dir":"/var/lib/aranya","uds_api_path":"/var/run/aranya/uds.sock","pid_file":"/var/run/aranya/daemon.pid","sync_addr":"0.0.0.0:4321","afc":{"shm_path":"/var/lib/aranya/afc","unlink_on_startup":true,"unlink_at_exit":true,"create":true,"max_chans":50}} 

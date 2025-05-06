@@ -1,5 +1,5 @@
 # Build stage
-FROM rust:1.73-slim-bookworm as builder
+FROM rust:1.85-slim-bookworm AS builder
 
 WORKDIR /workspace
 
@@ -8,40 +8,51 @@ RUN apt-get update && \
     apt-get install -y pkg-config libssl-dev build-essential git && \
     rm -rf /var/lib/apt/lists/*
 
-# Copy the entire project for proper dependency resolution
+# Copy only the necessary files for dependency resolution
+COPY Cargo.toml Cargo.lock ./
+
+# Download dependencies
+RUN cargo fetch
+
+# Copy the rest of the source code
 COPY . .
 
 # Build the binaries
-RUN cd socni && cargo build --release
+RUN cargo build --release
 
 # Final stage
-FROM debian:bookworm-slim
+FROM alpine:3.19
 
 WORKDIR /
 
 # Install runtime dependencies
-RUN apt-get update && \
-    apt-get install -y iproute2 bash sudo && \
-    rm -rf /var/lib/apt/lists/*
+RUN apk add --no-cache iproute2 bash sudo
 
 # Create necessary directories
-RUN mkdir -p /opt/cni/bin /etc/cni/net.d
+RUN mkdir -p /opt/cni/bin /etc/cni/net.d /etc/aranya/keystore /run/aranya
 
 # Copy binaries from builder stage
-COPY --from=builder /workspace/socni/target/release/socni /opt/cni/bin/vlan
-COPY --from=builder /workspace/socni/target/release/socni-ctl /usr/local/bin/socni-ctl
+COPY --from=builder /workspace/target/release/socni /opt/cni/bin/vlan
+COPY --from=builder /workspace/target/release/socni-ctl /usr/local/bin/socni-ctl
 
 # Make binaries executable
 RUN chmod +x /opt/cni/bin/vlan /usr/local/bin/socni-ctl
 
 # Copy installation scripts
-COPY socni/scripts/install-cni.sh /install-cni.sh
-COPY socni/scripts/install-cli.sh /install-cli.sh
+COPY scripts/install-cni.sh /install-cni.sh
+COPY scripts/install-cli.sh /install-cli.sh
 RUN chmod +x /install-cni.sh /install-cli.sh
 
 # Create a wrapper script that can handle different installation options
-RUN echo '#!/bin/bash\n\
+RUN echo '#!/bin/sh\n\
 if [ "$1" = "cni" ]; then\n\
+  # Ensure aranya keystore exists and has correct permissions\n\
+  mkdir -p /etc/aranya/keystore\n\
+  chmod 700 /etc/aranya/keystore\n\
+  # Ensure aranya socket directory exists\n\
+  mkdir -p /run/aranya\n\
+  chmod 755 /run/aranya\n\
+  # Run CNI installation\n\
   /install-cni.sh\n\
 elif [ "$1" = "cli" ]; then\n\
   /install-cli.sh\n\

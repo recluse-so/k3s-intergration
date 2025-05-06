@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: aranya-policy-init
+  namespace: aranya
+data:
+  init-policy.sh: |
+    #!/bin/sh
+    set -e
+    
+    # Create policy directory if it doesn't exist
+    mkdir -p /etc/aranya/policy
+    
+    # Copy the policy file from the mounted volume to the correct location
+    cp /etc/aranya/policy/team-policy.md /etc/aranya/policy.md
+    
+    echo "Policy file copied successfully" 

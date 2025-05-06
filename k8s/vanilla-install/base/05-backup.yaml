@@ -1,0 +1,102 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: aranya-backup-config
+  namespace: aranya
+data:
+  backup.sh: |
+    #!/bin/sh
+    set -e
+    
+    # Create backup directory
+    mkdir -p /backup
+    
+    # Get current timestamp
+    TIMESTAMP=$(date +%Y%m%d-%H%M%S)
+    
+    # Create backup of FactDB
+    tar -czf /backup/aranya-factdb-${TIMESTAMP}.tar.gz -C /var/lib/aranya factdb
+    
+    # Keep only the last 7 backups
+    ls -t /backup/aranya-factdb-*.tar.gz | tail -n +8 | xargs -r rm
+    
+    echo "Backup completed: aranya-factdb-${TIMESTAMP}.tar.gz"
+  restore.sh: |
+    #!/bin/sh
+    set -e
+    
+    if [ -z "$1" ]; then
+      echo "Usage: $0 <backup-file>"
+      exit 1
+    fi
+    
+    BACKUP_FILE=$1
+    
+    if [ ! -f "$BACKUP_FILE" ]; then
+      echo "Backup file not found: $BACKUP_FILE"
+      exit 1
+    fi
+    
+    # Stop the Aranya daemon
+    echo "Stopping Aranya daemon..."
+    kill -TERM $(cat /var/run/aranya/daemon.pid)
+    sleep 5
+    
+    # Restore FactDB
+    echo "Restoring FactDB from $BACKUP_FILE..."
+    tar -xzf $BACKUP_FILE -C /var/lib/aranya
+    
+    # Start the Aranya daemon
+    echo "Starting Aranya daemon..."
+    /usr/local/bin/aranya-daemon --config /etc/aranya/daemon.json &
+    
+    echo "Restore completed"
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: aranya-factdb-backup
+  namespace: aranya
+spec:
+  schedule: "0 2 * * *"  # Run at 2 AM daily
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: backup
+            image: busybox:1.36
+            command: ["/bin/sh", "/scripts/backup.sh"]
+            volumeMounts:
+            - name: factdb-storage
+              mountPath: /var/lib/aranya
+            - name: backup-script
+              mountPath: /scripts
+            - name: backup-volume
+              mountPath: /backup
+          volumes:
+          - name: factdb-storage
+            persistentVolumeClaim:
+              claimName: aranya-factdb
+          - name: backup-script
+            configMap:
+              name: aranya-backup-config
+              defaultMode: 0755
+          - name: backup-volume
+            persistentVolumeClaim:
+              claimName: aranya-backup-pvc
+          restartPolicy: OnFailure
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: aranya-backup-pvc
+  namespace: aranya
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 20Gi
+  storageClassName: standard 
