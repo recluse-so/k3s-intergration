@@ -72,6 +72,25 @@ check_prerequisites() {
     echo -e "${RED}build target not found in Makefile.${NC}"
     exit 1
   fi
+
+  # Check if Multus is installed
+  echo -e "${YELLOW}Checking for Multus CNI...${NC}"
+  if ! kubectl get crd network-attachment-definitions.k8s.cni.cncf.io >/dev/null 2>&1; then
+    echo -e "${YELLOW}Multus CNI is not installed. Installing now...${NC}"
+    kubectl apply -f https://raw.githubusercontent.com/k8snetworkplumbingwg/multus-cni/master/deployments/multus-daemonset.yml
+    
+    # Wait for Multus to be ready
+    echo -e "${YELLOW}Waiting for Multus to be ready...${NC}"
+    kubectl wait --for=condition=ready pod -l app=multus -n kube-system --timeout=120s
+    
+    if [ $? -ne 0 ]; then
+      echo -e "${RED}Failed to install Multus CNI.${NC}"
+      exit 1
+    fi
+    echo -e "${GREEN}Multus CNI installed successfully.${NC}"
+  else
+    echo -e "${GREEN}Multus CNI is already installed.${NC}"
+  fi
   
   echo -e "${GREEN}All prerequisites are satisfied.${NC}"
 }
@@ -206,7 +225,7 @@ deploy_cni_plugin() {
   
   cd "${SOCNI_DIR}"
   
-  if [ ! -f "manifests/daemonset.yaml" ]; then
+  if [ ! -f "deployments/daemonset.yaml" ]; then
     echo -e "${RED}DaemonSet manifest not found.${NC}"
     exit 1
   fi

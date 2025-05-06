@@ -28,7 +28,7 @@ spec:
           mountPath: /keys
           readOnly: true
       - name: policy-setup
-        image: socni:latest
+        image: recluseso/aranya-cni:latest
         command: ['sh', '-c', 'mkdir -p /etc/aranya/policies && cp /policies/* /etc/aranya/policies/ && chmod 600 /etc/aranya/policies/*']
         volumeMounts:
         - name: aranya-policies
@@ -38,7 +38,7 @@ spec:
           readOnly: true
       containers:
       - name: socni
-        image: socni:latest
+        image: recluseso/aranya-cni:latest
         imagePullPolicy: IfNotPresent
         command: ["/entrypoint.sh", "cni"]
         securityContext:

@@ -8,20 +8,21 @@ build:
 	cp ./target/release/socni-ctl bin/socni-ctl
 	chmod +x bin/vlan bin/socni-ctl
 
-# Build Docker image
+# Build Docker image locally
 docker-build-local:
 	docker build -t vlan-cni:latest -f Dockerfile.socni .
 
+# Build Docker image
 docker-build:
-	docker build -t ghcr.io/asaunders/vlan-cni:latest -f Dockerfile.socni .
+	docker build -t recluseso/aranya-cni:latest -f Dockerfile.socni .
 
 # Push Docker image to GitHub Container Registry
 docker-push:
-	docker push ghcr.io/asaunders/vlan-cni:latest
+	docker push recluseso/aranya-cni:latest
 
 # Deploy to Kubernetes
 deploy:
-	kubectl apply -f manifests/deployments/daemonset.yaml
+	kubectl apply -f manifests/socni-daemonset.yaml
 
 # Create network attachment definitions
 create-networks:

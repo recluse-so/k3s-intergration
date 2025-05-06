@@ -17,17 +17,13 @@ First, build the SOCNI container image:
 
 ```bash
 # From the root of your project
-docker build -t socni:latest -f socni/Dockerfile.socni .
-```
+docker build -t recluseso/aranya-cni:latest -f socni/Dockerfile.socni .
 
-Push the image to a registry accessible by your Kubernetes cluster:
+# Tag the image for your registry (if needed)
+docker tag recluseso/aranya-cni:latest your-registry.com/recluseso/aranya-cni:latest
 
-```bash
-# Tag the image for your registry
-docker tag socni:latest your-registry.com/socni:latest
-
-# Push to your registry
-docker push your-registry.com/socni:latest
+# Push the image to your registry
+docker push your-registry.com/recluseso/aranya-cni:latest
 ```
 
 ### 2. Apply the Kubernetes Manifests
