@@ -48,19 +48,29 @@ Aranya is a revolutionary micro-segmentation solution built on a zero-trust fram
 ### Quick Start
 
 1. Clone the repository:
+
    ```bash
-   git clone https://github.com/your-org/aranya.git
-   cd aranya
+   git clone https://github.com/recluseso/socni.git
+   cd socni
    ```
 
 2. Install the CNI plugin:
+
    ```bash
-   ./k8s/minikube-install/install-cni.sh
+   make install
    ```
 
-3. Verify installation:
+3. Install the SOCNI command line tool:
+
    ```bash
-   ./k8s/minikube-install/test-cni/scripts/test-socni.sh
+   make install-cli
+   ```
+
+4. Verify installation:
+
+   ```bash
+   make deploy
+   kubectl apply -f socni/manifests/plugin-install/socni-example-pod.yaml
    ```
 
 ## 🧪 Testing
@@ -79,29 +89,6 @@ The project includes comprehensive testing capabilities:
 - Network isolation
 - Multi-tenant scenarios
 - Performance metrics
-
-## 📁 Project Structure
-
-```
-aranya/
-├── k8s/
-│   └── minikube-install/
-│       ├── install-cni.sh
-│       └── test-cni/
-│           ├── manifests/
-│           │   ├── plugin-install/
-│           │   │   ├── socni-daemonset.yaml
-│           │   │   ├── socni-rbac.yaml
-│           │   │   └── socni-configmap.yaml
-│           │   ├── policy/
-│           │   │   ├── multi-tenant-policy.md
-│           │   │   └── socni-policy-rbac.yaml
-│           │   └── network-attachment-definitions/
-│           └── scripts/
-│               ├── test-socni.sh
-│               └── cleanup-socni.sh
-└── README.md
-```
 
 ## 🔄 Comparison with Other Solutions
 
@@ -159,7 +146,7 @@ aranya/
    - Lightweight implementation
    - Quick policy updates
 
-## 🤝 Contributing
+## 👐🏾 Contributing
 
 We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
 
@@ -167,7 +154,7 @@ We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) f
 
 This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details.
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 - Kubernetes community
 - CNI project
