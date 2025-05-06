@@ -19,3 +19,4 @@ scratch/*
 /aranya
 minikube-darwin-arm64
 token.repo
+check-token.sh
