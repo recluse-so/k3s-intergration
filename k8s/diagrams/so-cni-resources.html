@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg viewBox="0 0 1000 800" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect x="0" y="0" width="1000" height="800" fill="#f8f9fa" />
+  
+  <!-- Title -->
+  <text x="500" y="40" font-family="Arial" font-size="24" font-weight="bold" text-anchor="middle" fill="#333">SOCNI Kubernetes Resources Architecture</text>
+  
+  <!-- Main Components -->
+  <!-- SOCNI DaemonSet -->
+  <rect x="100" y="100" width="200" height="120" rx="8" ry="8" fill="#e6f2ff" stroke="#0066cc" stroke-width="2" />
+  <text x="200" y="130" font-family="Arial" font-size="16" font-weight="bold" text-anchor="middle" fill="#333">SOCNI DaemonSet</text>
+  <text x="200" y="155" font-family="Arial" font-size="12" text-anchor="middle" fill="#333">- Runs on each node</text>
+  <text x="200" y="175" font-family="Arial" font-size="12" text-anchor="middle" fill="#333">- Manages CNI plugin</text>
+  <text x="200" y="195" font-family="Arial" font-size="12" text-anchor="middle" fill="#333">- Handles network setup</text>
+  
+  <!-- RBAC -->
+  <rect x="100" y="250" width="200" height="120" rx="8" ry="8" fill="#d4edda" stroke="#28a745" stroke-width="2" />
+  <text x="200" y="280" font-family="Arial" font-size="16" font-weight="bold" text-anchor="middle" fill="#333">RBAC Resources</text>
+  <text x="200" y="305" font-family="Arial" font-size="12" text-anchor="middle" fill="#333">- ServiceAccount</text>
+  <text x="200" y="325" font-family="Arial" font-size="12" text-anchor="middle" fill="#333">- ClusterRole</text>
+  <text x="200" y="345" font-family="Arial" font-size="12" text-anchor="middle" fill="#333">- ClusterRoleBinding</text>
+  
+  <!-- ConfigMaps -->
+  <rect x="100" y="400" width="200" height="120" rx="8" ry="8" fill="#fff3cd" stroke="#ffc107" stroke-width="2" />
+  <text x="200" y="430" font-family="Arial" font-size="16" font-weight="bold" text-anchor="middle" fill="#333">ConfigMaps</text>
+  <text x="200" y="455" font-family="Arial" font-size="12" text-anchor="middle" fill="#333">- SOCNI Configuration</text>
+  <text x="200" y="475" font-family="Arial" font-size="12" text-anchor="middle" fill="#333">- Policy Definitions</text>
+  <text x="200" y="495" font-family="Arial" font-size="12" text-anchor="middle" fill="#333">- Multi-tenant Settings</text>
+  
+  <!-- Network Attachment Definitions -->
+  <rect x="400" y="100" width="200" height="120" rx="8" ry="8" fill="#f8d7da" stroke="#dc3545" stroke-width="2" />
+  <text x="500" y="130" font-family="Arial" font-size="16" font-weight="bold" text-anchor="middle" fill="#333">NetworkAttachmentDefinitions</text>
+  <text x="500" y="155" font-family="Arial" font-size="12" text-anchor="middle" fill="#333">- VLAN Configurations</text>
+  <text x="500" y="175" font-family="Arial" font-size="12" text-anchor="middle" fill="#333">- Network Policies</text>
+  <text x="500" y="195" font-family="Arial" font-size="12" text-anchor="middle" fill="#333">- Security Rules</text>
+  
+  <!-- Example Pods -->
+  <rect x="400" y="250" width="200" height="120" rx="8" ry="8" fill="#cce5ff" stroke="#004085" stroke-width="2" />
+  <text x="500" y="280" font-family="Arial" font-size="16" font-weight="bold" text-anchor="middle" fill="#333">Example Pods</text>
+  <text x="500" y="305" font-family="Arial" font-size="12" text-anchor="middle" fill="#333">- Multi-tenant Example</text>
+  <text x="500" y="325" font-family="Arial" font-size="12" text-anchor="middle" fill="#333">- Network Annotation</text>
+  <text x="500" y="345" font-family="Arial" font-size="12" text-anchor="middle" fill="#333">- Policy Enforcement</text>
+  
+  <!-- Existing CNI Integration -->
+  <rect x="700" y="100" width="200" height="120" rx="8" ry="8" fill="#e2e3e5" stroke="#383d41" stroke-width="2" />
+  <text x="800" y="130" font-family="Arial" font-size="16" font-weight="bold" text-anchor="middle" fill="#333">Existing CNI</text>
+  <text x="800" y="155" font-family="Arial" font-size="12" text-anchor="middle" fill="#333">- Base Network Layer</text>
+  <text x="800" y="175" font-family="Arial" font-size="12" text-anchor="middle" fill="#333">- Primary CNI Plugin</text>
+  <text x="800" y="195" font-family="Arial" font-size="12" text-anchor="middle" fill="#333">- Network Foundation</text>
+  
+  <!-- Policy Management -->
+  <rect x="700" y="250" width="200" height="120" rx="8" ry="8" fill="#d1ecf1" stroke="#0c5460" stroke-width="2" />
+  <text x="800" y="280" font-family="Arial" font-size="16" font-weight="bold" text-anchor="middle" fill="#333">Policy Management</text>
+  <text x="800" y="305" font-family="Arial" font-size="12" text-anchor="middle" fill="#333">- Policy RBAC</text>
+  <text x="800" y="325" font-family="Arial" font-size="12" text-anchor="middle" fill="#333">- Policy ConfigMaps</text>
+  <text x="800" y="345" font-family="Arial" font-size="12" text-anchor="middle" fill="#333">- Policy Updates</text>
+  
+  <!-- Aranya Integration -->
+  <rect x="400" y="400" width="500" height="120" rx="8" ry="8" fill="#cce5ff" stroke="#004085" stroke-width="2" />
+  <text x="650" y="430" font-family="Arial" font-size="16" font-weight="bold" text-anchor="middle" fill="#333">Aranya Integration</text>
+  <text x="650" y="455" font-family="Arial" font-size="12" text-anchor="middle" fill="#333">- Cryptographic Security</text>
+  <text x="650" y="475" font-family="Arial" font-size="12" text-anchor="middle" fill="#333">- Hardware-Level Enforcement</text>
+  <text x="650" y="495" font-family="Arial" font-size="12" text-anchor="middle" fill="#333">- Zero-Trust Security Model</text>
+  
+  <!-- Connection lines -->
+  <!-- DaemonSet to RBAC -->
+  <path d="M 200 220 L 200 250" stroke="#0066cc" stroke-width="2" fill="none" marker-end="url(#arrowhead)" />
+  
+  <!-- DaemonSet to ConfigMaps -->
+  <path d="M 200 370 L 200 400" stroke="#0066cc" stroke-width="2" fill="none" marker-end="url(#arrowhead)" />
+  
+  <!-- DaemonSet to NetworkAttachmentDefinitions -->
+  <path d="M 300 160 L 400 160" stroke="#0066cc" stroke-width="2" fill="none" marker-end="url(#arrowhead)" />
+  
+  <!-- NetworkAttachmentDefinitions to Example Pods -->
+  <path d="M 500 220 L 500 250" stroke="#dc3545" stroke-width="2" fill="none" marker-end="url(#arrowhead)" />
+  
+  <!-- Existing CNI to NetworkAttachmentDefinitions -->
+  <path d="M 700 160 L 600 160" stroke="#383d41" stroke-width="2" fill="none" marker-end="url(#arrowhead)" />
+  
+  <!-- Policy Management to ConfigMaps -->
+  <path d="M 700 370 L 300 370" stroke="#0c5460" stroke-width="2" fill="none" marker-end="url(#arrowhead)" />
+  
+  <!-- Aranya Integration to DaemonSet -->
+  <path d="M 400 460 L 300 460 L 300 160" stroke="#004085" stroke-width="2" fill="none" marker-end="url(#arrowhead)" />
+  
+  <!-- Arrow marker definition -->
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#0066cc" />
+    </marker>
+  </defs>
+  
+  <!-- Legend -->
+  <rect x="50" y="600" width="900" height="150" rx="8" ry="8" fill="#ffffff" stroke="#dee2e6" stroke-width="1" />
+  <text x="500" y="630" font-family="Arial" font-size="16" font-weight="bold" text-anchor="middle" fill="#333">Resource Relationships</text>
+  
+  <!-- Legend Items -->
+  <text x="100" y="660" font-family="Arial" font-size="12" fill="#333">• DaemonSet manages CNI plugin and network setup</text>
+  <text x="100" y="685" font-family="Arial" font-size="12" fill="#333">• RBAC provides necessary permissions</text>
+  <text x="100" y="710" font-family="Arial" font-size="12" fill="#333">• ConfigMaps store configuration and policies</text>
+  
+  <text x="500" y="660" font-family="Arial" font-size="12" fill="#333">• NetworkAttachmentDefinitions define network configurations</text>
+  <text x="500" y="685" font-family="Arial" font-size="12" fill="#333">• Example Pods demonstrate usage and policy enforcement</text>
+  <text x="500" y="710" font-family="Arial" font-size="12" fill="#333">• Aranya provides security and hardware-level enforcement</text>
+</svg> 

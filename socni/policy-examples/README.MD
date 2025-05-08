@@ -125,3 +125,15 @@ If an Admin wants to allow communication:
 4. Pods in Tenant A can now communicate with pods in Tenant B
 
 This policy language provides a powerful way to define and enforce network isolation and access control in a multi-tenant Kubernetes environment, ensuring that security boundaries are maintained according to the defined rules.
+
+### Configuration Flow For This CNI
+
+   Pod Creation
+   ↓
+   Pod Annotations
+   ↓
+   Aranya Policy Engine
+   ↓
+   SOCNI Plugin
+   ↓
+   Network Interface Creation

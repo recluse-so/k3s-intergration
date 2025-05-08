@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg viewBox="0 0 1200 900" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect x="0" y="0" width="1200" height="900" fill="#f8f9fa" />
+  
+  <!-- Title -->
+  <text x="600" y="40" font-family="Arial" font-size="24" font-weight="bold" text-anchor="middle" fill="#333">SOCNI - Security-First CNI Architecture</text>
+  
+  <!-- Node 1 -->
+  <rect x="100" y="150" width="500" height="600" rx="10" ry="10" fill="#e6f2ff" stroke="#0066cc" stroke-width="2" />
+  <text x="350" y="180" font-family="Arial" font-size="18" font-weight="bold" text-anchor="middle" fill="#333">Kubernetes Node 1</text>
+  
+  <!-- Node 2 -->
+  <rect x="600" y="150" width="500" height="600" rx="10" ry="10" fill="#e6f2ff" stroke="#0066cc" stroke-width="2" />
+  <text x="850" y="180" font-family="Arial" font-size="18" font-weight="bold" text-anchor="middle" fill="#333">Kubernetes Node 2</text>
+  
+  <!-- Node 1 Components -->
+  <!-- Pods -->
+  <rect x="120" y="210" width="120" height="80" rx="8" ry="8" fill="#d4edda" stroke="#28a745" stroke-width="2" />
+  <text x="180" y="235" font-family="Arial" font-size="16" font-weight="bold" text-anchor="middle" fill="#333">Pod A</text>
+  <text x="180" y="260" font-family="Arial" font-size="14" text-anchor="middle" fill="#333">VLAN 100</text>
+  
+  <rect x="120" y="310" width="120" height="80" rx="8" ry="8" fill="#d4edda" stroke="#28a745" stroke-width="2" />
+  <text x="180" y="335" font-family="Arial" font-size="16" font-weight="bold" text-anchor="middle" fill="#333">Pod B</text>
+  <text x="180" y="360" font-family="Arial" font-size="14" text-anchor="middle" fill="#333">VLAN 200</text>
+  
+  <!-- Kubelet -->
+  <rect x="260" y="210" width="100" height="120" rx="8" ry="8" fill="#f8d7da" stroke="#dc3545" stroke-width="2" />
+  <text x="310" y="235" font-family="Arial" font-size="16" font-weight="bold" text-anchor="middle" fill="#333">Kubelet</text>
+  <text x="310" y="260" font-family="Arial" font-size="12" text-anchor="middle" fill="#333">1. Creates pod</text>
+  <text x="310" y="280" font-family="Arial" font-size="12" text-anchor="middle" fill="#333">2. Calls SOCNI</text>
+  <text x="310" y="300" font-family="Arial" font-size="12" text-anchor="middle" fill="#333">plugin for secure</text>
+  <text x="310" y="320" font-family="Arial" font-size="12" text-anchor="middle" fill="#333">networking</text>
+  
+  <!-- Node 1 Aranya CNI Overlay -->
+  <rect x="120" y="400" width="460" height="200" rx="8" ry="8" fill="#f8f9fa" stroke="#6c757d" stroke-width="2" />
+  <text x="350" y="430" font-family="Arial" font-size="16" font-weight="bold" text-anchor="middle" fill="#333">Aranya CNI Overlay</text>
+  
+  <!-- Resources Grid Node 1 -->
+  <rect x="140" y="450" width="200" height="80" rx="4" ry="4" fill="#e6f2ff" stroke="#0066cc" stroke-width="1" />
+  <text x="240" y="480" font-family="Arial" font-size="14" font-weight="bold" text-anchor="middle" fill="#333">DaemonSet</text>
+  <text x="240" y="500" font-family="Arial" font-size="12" text-anchor="middle" fill="#333">- Runs SOCNI plugin</text>
+  <text x="240" y="515" font-family="Arial" font-size="12" text-anchor="middle" fill="#333">- Manages networking</text>
+  
+  <rect x="360" y="450" width="200" height="80" rx="4" ry="4" fill="#d4edda" stroke="#28a745" stroke-width="1" />
+  <text x="460" y="480" font-family="Arial" font-size="14" font-weight="bold" text-anchor="middle" fill="#333">RBAC</text>
+  <text x="460" y="500" font-family="Arial" font-size="12" text-anchor="middle" fill="#333">- ServiceAccount</text>
+  <text x="460" y="515" font-family="Arial" font-size="12" text-anchor="middle" fill="#333">- ClusterRole</text>
+  
+  <rect x="140" y="540" width="200" height="80" rx="4" ry="4" fill="#fff3cd" stroke="#ffc107" stroke-width="1" />
+  <text x="240" y="570" font-family="Arial" font-size="14" font-weight="bold" text-anchor="middle" fill="#333">ConfigMaps</text>
+  <text x="240" y="590" font-family="Arial" font-size="12" text-anchor="middle" fill="#333">- Configuration</text>
+  <text x="240" y="605" font-family="Arial" font-size="12" text-anchor="middle" fill="#333">- Policies</text>
+  
+  <rect x="360" y="540" width="200" height="80" rx="4" ry="4" fill="#f8d7da" stroke="#dc3545" stroke-width="1" />
+  <text x="460" y="570" font-family="Arial" font-size="14" font-weight="bold" text-anchor="middle" fill="#333">NetworkAttachmentDefinitions</text>
+  <text x="460" y="590" font-family="Arial" font-size="12" text-anchor="middle" fill="#333">- VLAN Config</text>
+  <text x="460" y="605" font-family="Arial" font-size="12" text-anchor="middle" fill="#333">- Security Rules</text>
+  
+  <!-- Node 1 SOCNI Plugin -->
+  <rect x="120" y="620" width="460" height="100" rx="8" ry="8" fill="#fff3cd" stroke="#ffc107" stroke-width="2" />
+  <text x="350" y="645" font-family="Arial" font-size="16" font-weight="bold" text-anchor="middle" fill="#333">SOCNI Plugin</text>
+  <text x="350" y="665" font-family="Arial" font-size="12" text-anchor="middle" fill="#333">- Hardware-level enforcement</text>
+  <text x="350" y="685" font-family="Arial" font-size="12" text-anchor="middle" fill="#333">- Cryptographic validation</text>
+  <text x="350" y="705" font-family="Arial" font-size="12" text-anchor="middle" fill="#333">- VLAN management</text>
+  
+  <!-- Node 2 Components -->
+  <!-- Pods -->
+  <rect x="620" y="210" width="120" height="80" rx="8" ry="8" fill="#d4edda" stroke="#28a745" stroke-width="2" />
+  <text x="680" y="235" font-family="Arial" font-size="16" font-weight="bold" text-anchor="middle" fill="#333">Pod C</text>
+  <text x="680" y="260" font-family="Arial" font-size="14" text-anchor="middle" fill="#333">VLAN 100</text>
+  
+  <rect x="620" y="310" width="120" height="80" rx="8" ry="8" fill="#d4edda" stroke="#28a745" stroke-width="2" />
+  <text x="680" y="335" font-family="Arial" font-size="16" font-weight="bold" text-anchor="middle" fill="#333">Pod D</text>
+  <text x="680" y="360" font-family="Arial" font-size="14" text-anchor="middle" fill="#333">VLAN 200</text>
+  
+  <!-- Kubelet -->
+  <rect x="760" y="210" width="100" height="120" rx="8" ry="8" fill="#f8d7da" stroke="#dc3545" stroke-width="2" />
+  <text x="810" y="235" font-family="Arial" font-size="16" font-weight="bold" text-anchor="middle" fill="#333">Kubelet</text>
+  <text x="810" y="260" font-family="Arial" font-size="12" text-anchor="middle" fill="#333">1. Creates pod</text>
+  <text x="810" y="280" font-family="Arial" font-size="12" text-anchor="middle" fill="#333">2. Calls SOCNI</text>
+  <text x="810" y="300" font-family="Arial" font-size="12" text-anchor="middle" fill="#333">plugin for secure</text>
+  <text x="810" y="320" font-family="Arial" font-size="12" text-anchor="middle" fill="#333">networking</text>
+  
+  <!-- Node 2 Aranya CNI Overlay -->
+  <rect x="620" y="400" width="460" height="200" rx="8" ry="8" fill="#f8f9fa" stroke="#6c757d" stroke-width="2" />
+  <text x="850" y="430" font-family="Arial" font-size="16" font-weight="bold" text-anchor="middle" fill="#333">Aranya CNI Overlay</text>
+  
+  <!-- Resources Grid Node 2 -->
+  <rect x="640" y="450" width="200" height="80" rx="4" ry="4" fill="#e6f2ff" stroke="#0066cc" stroke-width="1" />
+  <text x="740" y="480" font-family="Arial" font-size="14" font-weight="bold" text-anchor="middle" fill="#333">DaemonSet</text>
+  <text x="740" y="500" font-family="Arial" font-size="12" text-anchor="middle" fill="#333">- Runs SOCNI plugin</text>
+  <text x="740" y="515" font-family="Arial" font-size="12" text-anchor="middle" fill="#333">- Manages networking</text>
+  
+  <rect x="860" y="450" width="200" height="80" rx="4" ry="4" fill="#d4edda" stroke="#28a745" stroke-width="1" />
+  <text x="960" y="480" font-family="Arial" font-size="14" font-weight="bold" text-anchor="middle" fill="#333">RBAC</text>
+  <text x="960" y="500" font-family="Arial" font-size="12" text-anchor="middle" fill="#333">- ServiceAccount</text>
+  <text x="960" y="515" font-family="Arial" font-size="12" text-anchor="middle" fill="#333">- ClusterRole</text>
+  
+  <rect x="640" y="540" width="200" height="80" rx="4" ry="4" fill="#fff3cd" stroke="#ffc107" stroke-width="1" />
+  <text x="740" y="570" font-family="Arial" font-size="14" font-weight="bold" text-anchor="middle" fill="#333">ConfigMaps</text>
+  <text x="740" y="590" font-family="Arial" font-size="12" text-anchor="middle" fill="#333">- Configuration</text>
+  <text x="740" y="605" font-family="Arial" font-size="12" text-anchor="middle" fill="#333">- Policies</text>
+  
+  <rect x="860" y="540" width="200" height="80" rx="4" ry="4" fill="#f8d7da" stroke="#dc3545" stroke-width="1" />
+  <text x="960" y="570" font-family="Arial" font-size="14" font-weight="bold" text-anchor="middle" fill="#333">NetworkAttachmentDefinitions</text>
+  <text x="960" y="590" font-family="Arial" font-size="12" text-anchor="middle" fill="#333">- VLAN Config</text>
+  <text x="960" y="605" font-family="Arial" font-size="12" text-anchor="middle" fill="#333">- Security Rules</text>
+  
+  <!-- Node 2 SOCNI Plugin -->
+  <rect x="620" y="620" width="460" height="100" rx="8" ry="8" fill="#fff3cd" stroke="#ffc107" stroke-width="2" />
+  <text x="850" y="645" font-family="Arial" font-size="16" font-weight="bold" text-anchor="middle" fill="#333">SOCNI Plugin</text>
+  <text x="850" y="665" font-family="Arial" font-size="12" text-anchor="middle" fill="#333">- Hardware-level enforcement</text>
+  <text x="850" y="685" font-family="Arial" font-size="12" text-anchor="middle" fill="#333">- Cryptographic validation</text>
+  <text x="850" y="705" font-family="Arial" font-size="12" text-anchor="middle" fill="#333">- VLAN management</text>
+  
+  <!-- Aranya Integration Layer -->
+  <rect x="100" y="100" width="1000" height="40" rx="8" ry="8" fill="#cce5ff" stroke="#004085" stroke-width="2" />
+  <text x="600" y="125" font-family="Arial" font-size="16" font-weight="bold" text-anchor="middle" fill="#333">Aranya Decentralized Distributed Control Plane</text>
+  
+  <!-- Network Overlay -->
+  <path d="M 350 750 L 350 780 L 600 780 L 850 780 L 850 750" stroke="#0066cc" stroke-width="3" fill="none" stroke-dasharray="5,5" />
+  <text x="600" y="800" font-family="Arial" font-size="16" font-weight="bold" text-anchor="middle" fill="#333">Secure Network Fabric</text>
+  <text x="600" y="820" font-family="Arial" font-size="12" text-anchor="middle" fill="#333">Cryptographically secured cross-node communication</text>
+  
+  <!-- Connection lines -->
+  <!-- Node 1 -->
+  <path d="M 150 290 L 150 620" stroke="#28a745" stroke-width="2" fill="none" />
+  <path d="M 190 390 L 190 620" stroke="#28a745" stroke-width="2" fill="none" />
+  <path d="M 310 330 L 310 400" stroke="#dc3545" stroke-width="2" fill="none" marker-end="url(#arrowhead)" />
+  <path d="M 350 600 L 350 620" stroke="#6c757d" stroke-width="2" fill="none" marker-end="url(#arrowhead)" />
+  
+  <!-- Node 2 -->
+  <path d="M 650 290 L 650 620" stroke="#28a745" stroke-width="2" fill="none" />
+  <path d="M 690 390 L 690 620" stroke="#28a745" stroke-width="2" fill="none" />
+  <path d="M 810 330 L 810 400" stroke="#dc3545" stroke-width="2" fill="none" marker-end="url(#arrowhead)" />
+  <path d="M 850 600 L 850 620" stroke="#6c757d" stroke-width="2" fill="none" marker-end="url(#arrowhead)" />
+  
+  <!-- Pod-to-Pod Communication -->
+  <path d="M 200 210 C 250 120, 950 120, 1000 210" stroke="#dc3545" stroke-width="2" fill="none" stroke-dasharray="3,3" />
+  <text x="600" y="100" font-family="Arial" font-size="16" font-weight="bold" text-anchor="middle" fill="#dc3545">Secure Pod-to-Pod Communication</text>
+  
+  <!-- Arrow marker definition -->
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#0066cc" />
+    </marker>
+  </defs>
+</svg> 

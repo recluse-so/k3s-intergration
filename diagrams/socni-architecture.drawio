@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net">
+  <diagram name="SOCNI Architecture" id="socni-arch-1">
+    <mxGraphModel dx="1200" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1200" pageHeight="900" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <!-- Aranya Control Plane -->
+        <mxCell id="2" value="Aranya Decentralized Distributed Control Plane" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#cce5ff;strokeColor=#004085;fontSize=16;fontStyle=1;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="200" y="20" width="800" height="60" as="geometry" />
+        </mxCell>
+        <!-- Node 1 -->
+        <mxCell id="3" value="Kubernetes Node 1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e6f2ff;strokeColor=#0066cc;fontSize=14;fontStyle=1;align=center;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="80" y="100" width="480" height="650" as="geometry" />
+        </mxCell>
+        <!-- Node 2 -->
+        <mxCell id="4" value="Kubernetes Node 2" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e6f2ff;strokeColor=#0066cc;fontSize=14;fontStyle=1;align=center;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="640" y="100" width="480" height="650" as="geometry" />
+        </mxCell>
+        <!-- Node 1: Pods -->
+        <mxCell id="5" value="Pod A\nVLAN 100" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d4edda;strokeColor=#28a745;fontSize=12;fontStyle=1;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="120" y="140" width="100" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="6" value="Pod B\nVLAN 200" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d4edda;strokeColor=#28a745;fontSize=12;fontStyle=1;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="240" y="140" width="100" height="60" as="geometry" />
+        </mxCell>
+        <!-- Node 1: Kubelet -->
+        <mxCell id="7" value="Kubelet" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8d7da;strokeColor=#dc3545;fontSize=12;fontStyle=1;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="360" y="140" width="100" height="60" as="geometry" />
+        </mxCell>
+        <!-- Node 1: Aranya CNI Overlay -->
+        <mxCell id="8" value="Aranya CNI Overlay" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8f9fa;strokeColor=#6c757d;fontSize=13;fontStyle=1;align=center;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="120" y="220" width="340" height="260" as="geometry" />
+        </mxCell>
+        <!-- Node 1: DaemonSet -->
+        <mxCell id="9" value="DaemonSet\n- Runs SOCNI plugin\n- Manages networking" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e6f2ff;strokeColor=#0066cc;fontSize=11;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="140" y="250" width="140" height="60" as="geometry" />
+        </mxCell>
+        <!-- Node 1: RBAC -->
+        <mxCell id="10" value="RBAC\n- ServiceAccount\n- ClusterRole" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d4edda;strokeColor=#28a745;fontSize=11;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="280" y="250" width="140" height="60" as="geometry" />
+        </mxCell>
+        <!-- Node 1: ConfigMaps -->
+        <mxCell id="11" value="ConfigMaps\n- Configuration\n- Policies" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff3cd;strokeColor=#ffc107;fontSize=11;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="140" y="320" width="140" height="60" as="geometry" />
+        </mxCell>
+        <!-- Node 1: NetworkAttachmentDefinitions -->
+        <mxCell id="12" value="NetworkAttachmentDefinitions\n- VLAN Config\n- Security Rules" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8d7da;strokeColor=#dc3545;fontSize=11;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="280" y="320" width="140" height="60" as="geometry" />
+        </mxCell>
+        <!-- Node 1: SOCNI Plugin -->
+        <mxCell id="13" value="SOCNI Plugin\n- Hardware-level enforcement\n- Cryptographic validation\n- VLAN management" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff3cd;strokeColor=#ffc107;fontSize=12;fontStyle=1;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="160" y="400" width="240" height="70" as="geometry" />
+        </mxCell>
+        <!-- Node 2: Pods -->
+        <mxCell id="14" value="Pod C\nVLAN 100" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d4edda;strokeColor=#28a745;fontSize=12;fontStyle=1;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="680" y="140" width="100" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="15" value="Pod D\nVLAN 200" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d4edda;strokeColor=#28a745;fontSize=12;fontStyle=1;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="800" y="140" width="100" height="60" as="geometry" />
+        </mxCell>
+        <!-- Node 2: Kubelet -->
+        <mxCell id="16" value="Kubelet" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8d7da;strokeColor=#dc3545;fontSize=12;fontStyle=1;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="920" y="140" width="100" height="60" as="geometry" />
+        </mxCell>
+        <!-- Node 2: Aranya CNI Overlay -->
+        <mxCell id="17" value="Aranya CNI Overlay" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8f9fa;strokeColor=#6c757d;fontSize=13;fontStyle=1;align=center;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="680" y="220" width="340" height="260" as="geometry" />
+        </mxCell>
+        <!-- Node 2: DaemonSet -->
+        <mxCell id="18" value="DaemonSet\n- Runs SOCNI plugin\n- Manages networking" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e6f2ff;strokeColor=#0066cc;fontSize=11;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="700" y="250" width="140" height="60" as="geometry" />
+        </mxCell>
+        <!-- Node 2: RBAC -->
+        <mxCell id="19" value="RBAC\n- ServiceAccount\n- ClusterRole" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d4edda;strokeColor=#28a745;fontSize=11;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="840" y="250" width="140" height="60" as="geometry" />
+        </mxCell>
+        <!-- Node 2: ConfigMaps -->
+        <mxCell id="20" value="ConfigMaps\n- Configuration\n- Policies" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff3cd;strokeColor=#ffc107;fontSize=11;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="700" y="320" width="140" height="60" as="geometry" />
+        </mxCell>
+        <!-- Node 2: NetworkAttachmentDefinitions -->
+        <mxCell id="21" value="NetworkAttachmentDefinitions\n- VLAN Config\n- Security Rules" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8d7da;strokeColor=#dc3545;fontSize=11;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="840" y="320" width="140" height="60" as="geometry" />
+        </mxCell>
+        <!-- Node 2: SOCNI Plugin -->
+        <mxCell id="22" value="SOCNI Plugin\n- Hardware-level enforcement\n- Cryptographic validation\n- VLAN management" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff3cd;strokeColor=#ffc107;fontSize=12;fontStyle=1;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="720" y="400" width="240" height="70" as="geometry" />
+        </mxCell>
+        <!-- Secure Network Fabric -->
+        <mxCell id="23" value="Secure Network Fabric\nCryptographically secured cross-node communication" style="rounded=1;whiteSpace=wrap;html=1;dashed=1;strokeColor=#0066cc;fillColor=#f8f9fa;fontSize=13;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="300" y="780" width="600" height="60" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile> 

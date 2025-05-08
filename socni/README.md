@@ -400,3 +400,37 @@ The main advantage of Aranya is that it combines these features in a single, coh
 - If you need lightweight encryption: **WireGuard**
 - If you need VM-based isolation: **KubeVirt**
 - If you need cloud-scale networking: **OpenStack Neutron**
+
+### Architecture
+
+   Kubernetes
+   ↓
+   Multus CNI (Primary CNI)
+   ↓
+   SOCNI (Secondary CNI)
+   ↓
+   Aranya Policy Engine
+
+### Integration Points
+
+Integration Points:
+Multus CNI manages the primary network interface
+SOCNI adds secure VLAN interfaces as secondary networks
+Aranya provides policy enforcement for both
+
+Benefits:
+Maintains existing network functionality
+Adds security layer without disruption
+Enables gradual migration
+Supports multiple network interfaces
+
+### Workflow
+
+   Pod Creation
+   ↓
+   Multus CNI creates primary interface
+   ↓
+   SOCNI creates secure VLAN interface
+   ↓
+   Aranya enforces policies
+
