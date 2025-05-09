@@ -44,4 +44,4 @@ EOF
 sudo chmod 600 "$ARANYA_CONFIG"
 
 echo "Aranya setup complete. You can now start the daemon with:"
-echo "sudo /usr/local/bin/aranya-daemon $ARANYA_CONFIG" 
+echo "sudo aranya-daemon $ARANYA_CONFIG"

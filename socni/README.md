@@ -434,3 +434,13 @@ Supports multiple network interfaces
    ↓
    Aranya enforces policies
 
+
+## Notes
+
+SOCNI project, there is no explicit logic that distinguishes between a Kubernetes control plane (controller/master) node and a worker node. The SOCNI plugin and its CLI (socni-ctl) are designed to operate on any node where the CNI is installed and invoked, without checking the node's role.
+Key points:
+The code does not check node labels, taints, or other Kubernetes metadata to determine if it is running on a control plane or worker node.
+All operations (VLAN creation, management, enforcement) are performed based on local configuration and environment variables, not node role.
+In Kubernetes best practices, CNI plugins are typically deployed as DaemonSets and are not scheduled on control plane nodes unless explicitly allowed.
+Summary:
+SOCNI assumes it is running on a node where pod networking is required, and does not differentiate between control plane and worker nodes in its logic. If you want to restrict SOCNI to only run on worker nodes, this should be handled at the Kubernetes deployment level (e.g., with node selectors or taints/tolerations in the DaemonSet manifest).
